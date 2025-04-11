@@ -16,7 +16,7 @@ const UserList = () => {
                 {users && users.length > 0 ? (
                     users.map((user: Customer) => (
                         // Ensure user.id is unique
-                        <li key={user.id}>{user.fullName}</li>
+                        <li key={user.id}>{user.fullname}</li>
                     ))
                 ) : (
                     <li>No users available</li>

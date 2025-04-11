@@ -1,14 +1,17 @@
 import {useState} from "react";
 import {Customer} from "../models/Customer";
-import {checkUsername, getQuantity, getUser, getUsers} from "../server/api/customers/customer.get";
-import {login} from "../server/api/customers/customer.post";
+import {login} from "../server/api/authentication/auth.post";
+import {checkUsername, getQuantity, getUser} from "../server/api/customers/customer.get";
+import {initPasswordReset, register, resetPassword} from "../server/api/customers/customer.post";
+import {ChangePasswordDto} from "../models/ChangePasswordDto";
+import {changePassword} from "../server/api/customers/customer.patch";
+import {updateCustomer} from "../server/api/customers/customer.put";
 
 function useCustomer() {
     const [users, setUsers] = useState<Customer[]>([]);
     const [user, setUser] = useState<Customer | null>(null);
     const [quantity, setQuantity] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
 
 
     const handleLogin = async (username: string, password: string) => {
@@ -16,50 +19,96 @@ function useCustomer() {
             const userData = await login(username, password);
             setUsers(userData);
             return userData;
-        } catch (err: any) {
-            setError(err.message);
-            throw new Error("Login failed");
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+
         }
     };
-
-    const fetchUserData = async () => {
-        try {
-            const users = await getUsers();
-            console.log("Fetched users:", users);
-        } catch (error: any) {
-            console.error(error.message);
-        }
-    };
-
 
     const fetchUser = async () => {
         try {
             const userData = await getUser();
             setUser(userData);
-        } catch (er: any) {
-            setError(er.message);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+
         }
     };
 
-    const fetchQuantity = async () => {
+    const fetchQuantity = async (userId: number) => {
 
         try {
-            const data = await getQuantity();
+            const data = await getQuantity(userId);
             setQuantity(data);
-        } catch (error: any) {
-            console.error("Error fetching quantity:", error.message);
-            setError(error.message);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
         }
     };
 
-    const fetchCheckUsername = async (username: string): Promise<boolean> => {
+    const fetchCheckUsername = async (username: string) => {
         try {
-            const response = await checkUsername(username);
-            setUsernameAvailable(response);
-            return response;
+           return  await checkUsername(username);
         } catch (error) {
-            setUsernameAvailable(false);
-            return false;
+            const message = error instanceof Error ? error.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+
+        }
+    }
+
+    const fetchRegister = async (fullname: string, username: string, email: string, password: string, phone: string) => {
+        try {
+            await register(fullname, username, email, password, phone);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+        }
+
+    }
+    const fetchInitPasswordReset = async (username: string) => {
+        try {
+            await initPasswordReset(username);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+        }
+    };
+
+
+    const fetchResetPassword = async (username: string, resetCode: string, newPassword: string) => {
+        try {
+            await resetPassword(username, resetCode, newPassword);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+        }
+    }
+
+    const fetchChangePassword = async (customerId: number, dto: ChangePasswordDto) => {
+        try {
+            await changePassword(customerId, dto);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
+        }
+    }
+    const fetchUpdateCustomer = async (customerId: number, customer: Customer) => {
+        try {
+            await updateCustomer(customerId, customer);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unknown error occurred";
+            setError(message);
+            throw new Error(message);
         }
     }
 
@@ -69,12 +118,17 @@ function useCustomer() {
         users,
         error,
         handleLogin,
-        fetchUserData,
+        // fetchUserData,
         fetchUser,
         fetchQuantity,
         quantity,
         fetchCheckUsername,
-        usernameAvailable,
+        fetchRegister,
+        fetchInitPasswordReset,
+        fetchResetPassword,
+        fetchChangePassword,
+        fetchUpdateCustomer
+
     };
 }
 
