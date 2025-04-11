@@ -1,51 +1,12 @@
 import {Customer} from "../../../models/Customer";
-import {jwtDecode} from "jwt-decode";
-
-export const getCustomerIdFromToken = (): number | null => {
-    const token = localStorage.getItem("authToken");
-    if (!token) return null;
-
-    try {
-        const decoded: any = jwtDecode(token);
-        return decoded.customerId || null;
-    } catch (error) {
-        console.error("Invalid token", error);
-        return null;
-    }
-};
-
-export const getUsers = async (): Promise<Customer[]> => {
-    try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("No authentication token found.");
-
-        const response = await fetch("/api/customer/list", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-        });
-
-        if (!response.ok) throw new Error(`Failed to fetch users: ${response.status}`);
-
-        return await response.json();
-    } catch (error: any) {
-        console.error(error.message);
-        throw new Error("Error fetching users.");
-    }
-};
 
 export const getUser = async (): Promise<Customer> => {
     try {
         const token = localStorage.getItem("authToken");
-        const customerId = getCustomerIdFromToken();
-        if (!token || !customerId) {
+        if (!token) {
             throw new Error("Authentication token or customer ID is missing.");
         }
-
-
-        const response = await fetch(`/api/customer/${customerId}`, {
+        const response = await fetch("/api/customer/profile", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -55,18 +16,20 @@ export const getUser = async (): Promise<Customer> => {
 
         if (!response.ok) throw new Error(`Failed to fetch user: ${response.status}`);
 
-        return await response.json();
+
+        const data = await response.json();
+
+        return data.data;
     } catch (error: any) {
         console.error(error.message);
         throw new Error("Error fetching user.");
     }
 };
 
-export const getQuantity = async (): Promise<any> => {
+export const getQuantity = async (customerId: number): Promise<any> => {
     try {
         const token = localStorage.getItem("authToken");
-        const customerId = getCustomerIdFromToken();
-        if (!token || !customerId) {
+        if (!token) {
             throw new Error("Authentication token or customer ID is missing.");
         }
         const response = await fetch(`/api/customer/quantity/${customerId}`, {
@@ -77,7 +40,8 @@ export const getQuantity = async (): Promise<any> => {
             },
         })
         if (!response.ok) throw new Error(`Fail to fetch quantity: ${response.status}`);
-        return await response.json();
+        const data = await response.json();
+        return data.data;
 
 
     } catch (error: any) {
@@ -86,28 +50,29 @@ export const getQuantity = async (): Promise<any> => {
     }
 
 }
-
 export const checkUsername = async (username: string): Promise<boolean> => {
     try {
         const token = localStorage.getItem("authToken");
-        const respone = await fetch(`/api/customer/checkUsername/${username}`, {
+        const response = await fetch(`/api/customer/checkUsername/${username}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-
+                Authorization: `Bearer ${token}`
             }
-
         });
-        if (!respone.ok) throw new Error("Fail to fecth username: " + respone.status);
-        const data = await respone.json();
-        return data.available;
 
-    } catch (errer) {
-        return false;
+        if (!response.ok) {
+            throw new Error("Unauthorized or error in response");
+        }
+
+        const result = await response.json();
+        return result.data === true;
+    } catch (err: any) {
+        console.error("checkUsername error:", err.message);
+        throw new Error("Fail to checkUsername");
     }
+};
 
-}
 
 
 
