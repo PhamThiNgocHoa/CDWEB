@@ -26,7 +26,7 @@ export const getUser = async (): Promise<Customer> => {
     }
 };
 
-export const getQuantity = async (customerId: number): Promise<any> => {
+export const getQuantity = async (customerId: number): Promise<number> => {
     try {
         const token = localStorage.getItem("authToken");
         if (!token) {

@@ -18,5 +18,4 @@ export const updateCustomer = async (customerId: number, customer: Customer): Pr
         throw new Error(data.message || "Cập nhật thất bại");
     }
 
-    return;
 };

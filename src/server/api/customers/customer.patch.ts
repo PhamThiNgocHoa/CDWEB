@@ -12,10 +12,13 @@ export const changePassword = async (
         body: JSON.stringify(dto)
     });
 
-    const data = await response.json();
     if (!response.ok) {
-        throw new Error(data.message || "Change password failed");
+        try {
+            const data = await response.json();
+            throw new Error(data.message || "Change password failed");
+        } catch (err) {
+            throw new Error("Unexpected error occurred");
+        }
     }
 
-    return data;
 };
