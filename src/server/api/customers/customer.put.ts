@@ -1,22 +1,8 @@
 import {Customer} from "../../../models/Customer";
+import ApiService from "../ApiService";
 
 export const updateCustomer = async (customerId: number, customer: Customer): Promise<void> => {
-    const token = localStorage.getItem("authToken");
+    const {data} = await ApiService.put(`/api/customer/${customerId}`, customer);
+    return data;
 
-    const response = await fetch(`/api/customer/${customerId}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token || ""}`,
-        },
-        body: JSON.stringify(customer),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || "Cập nhật thất bại");
-    }
-
-    return;
 };

@@ -1,13 +1,14 @@
 export interface Customer {
-    id: number;
+    id?: number;
     fullname: string;
-    username: string;
     email: string;
-    password: string;
     phone: string;
-    role: boolean;
-    resetCode: string;
+    username: string;
+    password: string;
+    role?: string;
+    resetCode?: string;
 }
+
 
 
 

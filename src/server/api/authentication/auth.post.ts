@@ -1,23 +1,39 @@
-import {jwtDecode} from 'jwt-decode';  // Sử dụng cú pháp import đúng
+import {jwtDecode} from 'jwt-decode';
+import ApiService from "../ApiService";
+
+export const register = async (
+    fullname: string,
+    username: string,
+    email: string,
+    password: string,
+    phone: string
+): Promise<void> => {
+    try {
+        const {data} = await ApiService.post("/api/auth/register", {
+            fullname,
+            username,
+            email,
+            password,
+            phone
+        }, {}, false);
+        console.log("Registration successful:", data);
+    } catch (error: any) {
+        console.error("Registration failed:", error.message);
+        throw new Error("Registration failed");
+    }
+};
 
 export const login = async (username: string, password: string): Promise<any> => {
     try {
-        const response = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({username, password}),
-        });
+        const response = await ApiService.post("/api/auth/login", {username, password}, {}, false);
 
-        if (!response.ok) throw new Error(`Login failed: ${response.status}`);
-
-        const data = await response.json();
-
-        const {token} = data.data;
+        const token = response.data.token;
 
         if (token) {
             localStorage.setItem("authToken", token);
 
             const decoded: any = jwtDecode(token);
+            console.log("Decoded Token:", decoded);
         }
 
         return {success: true};
@@ -26,3 +42,6 @@ export const login = async (username: string, password: string): Promise<any> =>
         throw new Error("Login failed");
     }
 };
+
+
+
