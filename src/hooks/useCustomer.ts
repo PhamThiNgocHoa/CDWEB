@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Customer } from "../models/Customer";
-import { login } from "../server/api/authentication/auth.post";
+import {login, register} from "../server/api/authentication/auth.post";
 import { checkUsername, getQuantity, getUser } from "../server/api/customers/customer.get";
-import { initPasswordReset, register, resetPassword } from "../server/api/customers/customer.post";
+import { initPasswordReset, resetPassword } from "../server/api/customers/customer.post";
 import { ChangePasswordDto } from "../models/ChangePasswordDto";
 import { changePassword } from "../server/api/customers/customer.patch";
 import { updateCustomer } from "../server/api/customers/customer.put";
