@@ -17,7 +17,7 @@ function Login() {
         try {
             await handleLogin(formData.username, formData.password);
             // Nếu đăng nhập thành công, điều hướng sang trang UserList
-            navigate("/UserProfile");
+            navigate("/userProfile");
         } catch (err) {
             console.error("Login failed:", err);
         }

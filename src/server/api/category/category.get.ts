@@ -12,7 +12,8 @@ export const getListCategory = async (): Promise<Category[]> => {
     });
 
     if (!respones.ok) {
-        throw new Error("Unauthorized or error in response");
+        const data = await respones.json();
+        throw new Error(data.message || "Unauthorized or error in response");
     }
     return await respones.json();
 }
@@ -28,7 +29,8 @@ export const getCategoryById = async (categoryId: number): Promise<Category> => 
 
     });
     if (!respones.ok) {
-        throw new Error("Unauthorized or error in response");
+        const data = await respones.json();
+        throw new Error(data.message || "Unauthorized or error in response");
     }
     return await respones.json();
 }
