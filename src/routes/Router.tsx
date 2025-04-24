@@ -2,6 +2,8 @@
 import React from 'react';
 import {Route, Routes} from "react-router-dom";
 import Login from "../components/login/Login";
+import UserProfile from "../components/user/UserProfile";
+import CategoryList from "../components/user/CategoryList";
 
 
 const Router = () => {
@@ -10,8 +12,8 @@ const Router = () => {
             {/* Định nghĩa các route */}
             <Route path="/" element={<Login />} />
             {/*<Route path="/userlist" element={<UserList />} />*/}
-            {/*<Route path="/userProfile" element={<UserProfile />} />*/}
-            {/*<Route path="/category" element={<CategoryList />} />*/}
+            <Route path="/userProfile" element={<UserProfile />} />
+            <Route path="/category" element={<CategoryList />} />
 
         </Routes>
     );
