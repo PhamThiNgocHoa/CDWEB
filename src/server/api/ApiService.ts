@@ -1,3 +1,5 @@
+import axios from "axios";
+
 class ApiService {
     private static getAuthHeaders() {
         const token = localStorage.getItem("authToken");
@@ -22,29 +24,24 @@ class ApiService {
     ): Promise<any> {
         try {
             const combinedHeaders = requireAuth
-                ? {...ApiService.getAuthHeaders(), ...headers}
-                : {"Content-Type": "application/json", ...headers};
+                ? { ...ApiService.getAuthHeaders(), ...headers }
+                : { "Content-Type": "application/json", ...headers };
 
-            const options: RequestInit = {
-                method: method,
+            const axiosConfig: any = {
+                url,
+                method,
                 headers: combinedHeaders,
+                data: body,
             };
 
-            if (body) {
-                options.body = JSON.stringify(body);
-            }
+            const response = await axios(axiosConfig);
 
-            const response = await fetch(url, options);
-
-            if (!response.ok) {
-                const errorMessage = await response.text();
-                throw new Error(`Failed to fetch data: ${response.status} - ${errorMessage}`);
-            }
-
-            return await response.json();
+            return response.data;
         } catch (error: any) {
             console.error("Error during API call:", error.message);
-            throw new Error(`Error fetching data: ${error.message}`);
+            throw new Error(
+                `Error fetching data: ${error.response?.status} - ${error.response?.data || error.message}`
+            );
         }
     }
 

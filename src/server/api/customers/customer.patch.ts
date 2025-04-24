@@ -6,6 +6,5 @@ export const changePassword = async (
     dto: ChangePasswordDto
 ): Promise<void> => {
 
-    const {data} = await ApiService.patch(`/api/customer/changePassword/${customerId}`, dto);
-    return data;
+    return ApiService.patch(`/api/customer/changePassword/${customerId}`, dto);
 };

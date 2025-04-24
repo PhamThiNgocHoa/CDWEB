@@ -1,8 +1,7 @@
 import ApiService from "../ApiService";
 
 export const initPasswordReset = async (username: string): Promise<void> => {
-    const {data} = await ApiService.post(`/api/customer/initPasswordReset/${username}`, {}, {}, false);
-    return data;
+    return ApiService.post(`/api/customer/initPasswordReset/${username}`, {}, {}, false);
 };
 
 export const resetPassword = async (
@@ -15,8 +14,7 @@ export const resetPassword = async (
         newPassword
     });
 
-    const {data} = await ApiService.post(`/api/customer/resetPassword/${username}?${params.toString()}`, {}, {}, false);
-    return data;
+    return ApiService.post(`/api/customer/resetPassword/${username}?${params.toString()}`, {}, {}, false);
 };
 
 

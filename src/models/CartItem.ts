@@ -1,9 +1,9 @@
-import {Cart} from "./Cart";
+import {CartResponse} from "./response/CartResponse";
 import {Product} from "./Product";
 
 export interface CartItem{
     id: number;
-    cart: Cart;
+    cart: CartResponse;
     product: Product;
     quantity: number;
 

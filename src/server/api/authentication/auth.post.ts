@@ -1,5 +1,7 @@
 import {jwtDecode} from 'jwt-decode';
 import ApiService from "../ApiService";
+import {IntrospectResponse} from "../../../models/response/IntrospectResponse";
+import {IntrospectRequest} from "../../../models/request/IntrospectRequest";
 
 export const register = async (
     fullname: string,
@@ -41,6 +43,17 @@ export const login = async (username: string, password: string): Promise<any> =>
         console.error("Error:", error.message);
         throw new Error("Login failed");
     }
+};
+export const logout = (): Promise<void> => {
+    return ApiService.post("/api/auth/logout", {}, {}, true).then(() => {
+        localStorage.removeItem("authToken");
+    });
+};
+
+export const authenticate = async (
+    request: IntrospectRequest
+): Promise<IntrospectResponse> => {
+    return await ApiService.post("/api/auth/introspect", request);
 };
 
 
