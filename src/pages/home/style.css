@@ -1,0 +1,20 @@
+/* @keyframes Slide Animation */
+@keyframes slide {
+    0% {
+        transform: translateX(0);
+    }
+    33% {
+        transform: translateX(-100%);
+    }
+    66% {
+        transform: translateX(-200%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Apply animation to elements */
+.animate-slide {
+    animation: slide 12s infinite linear;
+}

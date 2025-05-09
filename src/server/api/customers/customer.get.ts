@@ -10,5 +10,17 @@ export const getQuantity = async (customerId: number): Promise<number> => {
 };
 
 export const checkUsername = async (username: string): Promise<boolean> => {
-    return ApiService.get(`/api/customer/checkUsername/${username}`);
+    const res = await ApiService.get(`/api/customer/checkUsername/${username}`, {}, false);
+    return res.data === true;
 };
+
+export const checkEmail = async (email: string): Promise<boolean> => {
+    const res = await ApiService.get(`/api/customer/checkEmail/${email}`, {}, false);
+    return res.data === true;
+};
+
+
+
+
+
+

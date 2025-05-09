@@ -13,7 +13,7 @@ export interface ProductResponse{
     size: string;
     pageNumber: number;
     form: string;
-    categoryId:number;
+    categoryId: number;
     categoryName: string;
 
 }
