@@ -1,4 +1,4 @@
-export interface ProductResponse{
+export interface ProductResponse {
     id: number;
     name: string;
     img: string;
@@ -15,5 +15,6 @@ export interface ProductResponse{
     form: string;
     categoryId: number;
     categoryName: string;
+    discount: number;
 
 }

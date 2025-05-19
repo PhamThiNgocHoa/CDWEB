@@ -1,4 +1,4 @@
-import { logout } from "../server/api/authentication/auth.post"; // Import API logout
+import {checkTokenExpiration, logout} from "../server/api/authentication/auth.post"; // Import API logout
 import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,5 +16,14 @@ export const useAuth = () => {
         }
     };
 
-    return { isLoggedIn, handleLogout, setIsLoggedIn };
+    const fetchCheckTokenExpiration = async (token: string)=>{
+        try {
+            await checkTokenExpiration(token);
+        }catch (error:any){
+            console.log("Error:", error.message);
+            throw new Error("Login failed");
+        }
+    }
+
+    return { isLoggedIn, handleLogout, setIsLoggedIn, fetchCheckTokenExpiration };
 };

@@ -15,5 +15,6 @@ export interface Product{
     form: string;
     categoryId:number;
     categoryName: string;
+    discount: number;
 
 }

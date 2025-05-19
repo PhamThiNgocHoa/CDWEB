@@ -4,7 +4,8 @@ import {Category} from "../../../models/Category";
 import {ProductResponse} from "../../../models/response/ProductResponse";
 
 export const getProductById = async (productId: number): Promise<Product> => {
-    return ApiService.get(`/api/product/${productId}`);
+    const result = await ApiService.get(`/api/product/${productId}`);
+    return result.data;
 }
 export const getListProduct = async (): Promise<ProductResponse[]> => {
     const result = await ApiService.get("/api/product/list", false);
@@ -20,3 +21,7 @@ export const listFindByName = async (name: string): Promise<Product[]> => {
 export const getListCategory = async (categoryId: number): Promise<Category[]> => {
     return ApiService.get(`/api/product//list/${categoryId}`);
 };
+export const getProductSale = async (): Promise<ProductResponse[]> => {
+    const result = await ApiService.get("/api/product/sale", false);
+    return result.data;
+}

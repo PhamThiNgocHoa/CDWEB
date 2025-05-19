@@ -7,6 +7,6 @@ export const getListCategory = async (): Promise<Category[]> => {
 }
 
 export const getCategoryById = async (categoryId: number): Promise<Category> => {
-    return ApiService.get(`/api/category/${categoryId}`);
+    return ApiService.get(`/api/category/${categoryId}`, false);
 
 }
