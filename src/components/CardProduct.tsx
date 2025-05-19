@@ -1,38 +1,60 @@
-import {ProductResponse} from "../models/response/ProductResponse";
+import React from 'react';
+import {formatToVND} from "../hooks/formatToVND";
 
-const CardProduct: React.FC<ProductResponse> = (props) => {
+interface ProductProps {
+    id: number;
+    name: string;
+    img: string;
+    price: number;
+    discount?: number;
+    quantitySold: number;
+    onClick: () => void;
+}
+
+const CardProduct: React.FC<ProductProps> = (props) => {
     return (
-        <div className="w-64 bg-white rounded-lg border border-gray-300 shadow-lg p-4">
+        <div className="cursor-pointer w-64 bg-white rounded-lg border border-gray-300 shadow-lg p-2 py-4"
+             onClick={props.onClick}
+        >
             {/* Hình ảnh sản phẩm */}
-            <img src={props.img} alt={props.name} className="w-full h-48 object-cover rounded-md" />
+            <img src={props.img} alt={props.name} className="w-full h-48 object-cover rounded-md"/>
 
             {/* Tiêu đề sản phẩm */}
-            <h2 className="text-lg font-semibold text-center mt-4">{props.name}</h2>
+            {/* Tiêu đề sản phẩm */}
+            <h2 className="text-md truncate mt-3">
+                {props.name}
+            </h2>
 
             {/* Giá sản phẩm */}
-            <div className="flex justify-center items-center gap-2 mt-2">
-                <span className="text-gray-500 line-through">{props.price}</span>
-                <span className="text-red-600 font-bold text-xl">{props.price}</span>
-
-            </div>
-
-            {/* Thông tin thêm */}
-            <div className="text-center text-sm text-gray-600 mt-2">
-                <p>Nhà xuất bản: {props.publisher}</p>
-                <p>Tác giả: {props.author}</p>
-                <p>Năm xuất bản: {props.publishYear}</p>
+            <div className="flex flex-row w-full justify-between gap-2 mt-2">
+                <span className="text-red-500 font-bold">{formatToVND(props.price * 1000)} VND</span>
+                <span className="bg-red-500 p-1 rounded-md text-white text-xs">
+                    {(props.discount ? props.discount * 100 : 0)} %
+                </span>
             </div>
 
             {/* Số lượng đã bán */}
-            <div className="text-center text-sm text-gray-600 mt-2">
-                Số trang: <span className="font-bold text-green-600">{props.pageNumber}</span>
-            </div>
+            <div className="mt-2 text-center">
+                <div className="relative pt-1">
+                    <div className="flex mb-2 items-center justify-between">
+                    </div>
+                    <div className="flex mb-2 items-center justify-between">
+                        <div className="w-full bg-gray-200 rounded-full h-6 relative">
+                            <div
+                                className="bg-red-500 h-6 rounded-full flex items-center justify-center text-white text-xs"
+                                style={{width: `${(15 / 100) * 100}%`}}
+                            >
+                              <span className="absolute left-1 text-center text-black ">
+                                Đã bán {15}
+                              </span>
+                            </div>
+                        </div>
+                    </div>
 
-            {/* Nút Mua ngay */}
-            <button className="w-full mt-4 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition duration-300">
-                Mua ngay
-            </button>
+                </div>
+            </div>
         </div>
     );
 };
+
 export default CardProduct;

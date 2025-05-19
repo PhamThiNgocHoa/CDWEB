@@ -44,6 +44,7 @@ function useCategory() {
         error,
         fetchGetListCategory,
         fetchGetCategoryById,
+        setCategories,
     };
 }
 

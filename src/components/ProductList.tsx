@@ -19,7 +19,7 @@ const ProductList = () => {
                 <ul>
                     {products.map((product) => (
                         <div>
-                            <CardProduct img={product.img}/>
+                            {/*<CardProduct img={product.img}/>*/}
                         </div>
                     ))}
                 </ul>

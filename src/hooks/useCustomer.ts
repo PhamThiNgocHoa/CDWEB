@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Customer } from "../models/Customer";
-import {login, register} from "../server/api/authentication/auth.post";
-import { checkUsername, getQuantity, getUser } from "../server/api/customers/customer.get";
-import { initPasswordReset, resetPassword } from "../server/api/customers/customer.post";
-import { ChangePasswordDto } from "../models/ChangePasswordDto";
-import { changePassword } from "../server/api/customers/customer.patch";
-import { updateCustomer } from "../server/api/customers/customer.put";
+import {useState} from "react";
+import {Customer} from "../models/Customer";
+import {authenticate, login, register} from "../server/api/authentication/auth.post";
+import {checkUsername, getQuantity, getUser} from "../server/api/customers/customer.get";
+import {initPasswordReset, resetPassword} from "../server/api/customers/customer.post";
+import {ChangePasswordDto} from "../models/ChangePasswordDto";
+import {changePassword} from "../server/api/customers/customer.patch";
+import {updateCustomer} from "../server/api/customers/customer.put";
+import {IntrospectRequest} from "../models/request/IntrospectRequest";
 
 function useCustomer() {
     const [users, setUsers] = useState<Customer[]>([]);
@@ -123,6 +124,18 @@ function useCustomer() {
         }
     };
 
+    const fetchAuthenticate = async (request: IntrospectRequest) => {
+        setLoading(true);
+        try {
+            return await authenticate(request);
+        } catch (err) {
+            handleError(err);
+        } finally {
+            setLoading(false);
+
+        }
+    }
+
     return {
         user,
         users,
@@ -137,7 +150,8 @@ function useCustomer() {
         fetchInitPasswordReset,
         fetchResetPassword,
         fetchChangePassword,
-        fetchUpdateCustomer
+        fetchUpdateCustomer,
+        fetchAuthenticate
     };
 }
 
