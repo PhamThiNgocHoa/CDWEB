@@ -13,10 +13,12 @@ export const getListProduct = async (): Promise<ProductResponse[]> => {
 };
 
 export const searchProduct = async (name: string): Promise<Product[]> => {
-    return ApiService.get(`/api/product/search?name=${encodeURIComponent(name)}`, false);
+    const result = await ApiService.get(`/api/product/search?name=${encodeURIComponent(name)}`, false);
+    return result.data;
 };
 export const listFindByName = async (name: string): Promise<Product[]> => {
-    return ApiService.get(`/api/product/list/findByName/${name}`, false);
+    const result = await ApiService.get(`/api/product/list/findByName/${name}`, false);
+    return result.data;
 };
 export const getListCategory = async (categoryId: number): Promise<Category[]> => {
     return ApiService.get(`/api/product//list/${categoryId}`);

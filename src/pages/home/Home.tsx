@@ -10,7 +10,6 @@ import {checkTokenExpiration} from "../../server/api/authentication/auth.post"; 
 import Error from "../../components/Error";
 import CardProduct from "../../components/CardProduct";
 import useCategory from "../../hooks/useCategory";
-import {Category} from "../../models/Category";
 import ListCategory from "../../components/ListCategory";
 import {Product} from "../../models/Product";
 import useProduct from "../../hooks/useProduct"; // Import component Error popup

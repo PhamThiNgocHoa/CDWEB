@@ -7,10 +7,11 @@ import {ChangePasswordDto} from "../models/ChangePasswordDto";
 import {changePassword} from "../server/api/customers/customer.patch";
 import {updateCustomer} from "../server/api/customers/customer.put";
 import {IntrospectRequest} from "../models/request/IntrospectRequest";
+import {CustomerResponse} from "../models/response/CustomerResponse";
 
 function useCustomer() {
     const [users, setUsers] = useState<Customer[]>([]);
-    const [user, setUser] = useState<Customer | null>(null);
+    const [user, setUser] = useState<CustomerResponse | null>(null);
     const [quantity, setQuantity] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
