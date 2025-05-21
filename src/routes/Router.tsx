@@ -8,6 +8,9 @@ import Register from "../pages/Regiter";
 import ProductList from "../components/ProductList";
 import ProductDetail from "../pages/ProductDetail";
 import Cart from "../pages/Cart";
+import Product from "../pages/Product";
+import SearchProduct from "../pages/SearchProduct";
+import Checkout from "../pages/Checkout";
 
 const Router = () => {
     return (
@@ -22,6 +25,13 @@ const Router = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/productDetail/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/searchProduct/:name" element={<SearchProduct />} />
+            <Route path="/checkout" element={<Checkout />} />
+
+
+
+
 
 
 

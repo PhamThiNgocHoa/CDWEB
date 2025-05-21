@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import formatToVND from "../hooks/formatToVND";
 import CartItem from "../components/CartItem";
 import useCart from "../hooks/useCart";
 import {getCurrentUserId} from "../utils/authUtils";
+import useCartItem from "../hooks/useCartItem";
+import {CartItemRequest} from "../models/request/CartItemRequest";
 
 const Cart = () => {
     const tokenData = getCurrentUserId();
     const customerId = tokenData || null;
 
-    const { cartData, loading, error } = useCart(customerId);
+    const {cartData, loading, error} = useCart(customerId);
 
     const [cartItems, setCartItems] = useState<any[]>([]);
+    const {fetchDeleteCartItem, fetchUpdateQuantityCartItem} = useCartItem();
 
     useEffect(() => {
         if (cartData?.cartItems) {
@@ -30,25 +33,42 @@ const Cart = () => {
 
     const handleSelect = (id: number, isChecked: boolean) => {
         const updated = cartItems.map(item =>
-            item.id === id ? { ...item, selected: isChecked } : item
+            item.id === id ? {...item, selected: isChecked} : item
         );
         setCartItems(updated);
     };
 
-    const handleQuantityChange = (id: number, action: "increase" | "decrease") => {
-        const updated = cartItems.map(item => {
-            if (item.id === id) {
-                let quantity = item.quantity;
-                if (action === "increase") quantity += 1;
-                else if (action === "decrease" && quantity > 1) quantity -= 1;
-                return { ...item, quantity };
+    const handleQuantityChange = async (id: number, action: "increase" | "decrease") => {
+        let updatedItems = [...cartItems];
+        const itemToUpdate = updatedItems.find(item => item.id === id);
+
+        if (itemToUpdate) {
+            let newQuantity = itemToUpdate.quantity;
+
+            if (action === "increase") {
+                newQuantity += 1;
+            } else if (action === "decrease" && newQuantity > 1) {
+                newQuantity -= 1;
             }
-            return item;
-        });
-        setCartItems(updated);
+
+            itemToUpdate.quantity = newQuantity;
+
+            setCartItems(updatedItems);
+
+            const cartItemRequest: CartItemRequest = {
+                cartId: itemToUpdate.cartId,
+                productId: itemToUpdate.productId,
+                quantity: newQuantity,
+            };
+
+            await fetchUpdateQuantityCartItem(id, cartItemRequest);
+        }
     };
 
-    const removeItem = (id: number) => {
+
+    const removeItem = async (id: number) => {
+        await fetchDeleteCartItem(id);
+
         const updated = cartItems.filter(item => item.id !== id);
         setCartItems(updated);
     };
@@ -62,9 +82,9 @@ const Cart = () => {
     if (loading) {
         return (
             <>
-                <Header />
+                <Header/>
                 <div className="p-6 text-center">Đang tải giỏ hàng...</div>
-                <Footer />
+                <Footer/>
             </>
         );
     }
@@ -72,16 +92,16 @@ const Cart = () => {
     if (error) {
         return (
             <>
-                <Header />
+                <Header/>
                 <div className="p-6 text-center text-red-600">Lỗi: {error}</div>
-                <Footer />
+                <Footer/>
             </>
         );
     }
 
     return (
         <>
-            <Header />
+            <Header/>
             <div className="bg-gray-100">
                 <div className="grid grid-cols-1 md:grid-cols-2 py-6 max-w-7xl mx-auto pb-4">
                     <div>
@@ -129,7 +149,7 @@ const Cart = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer/>
         </>
     );
 };

@@ -7,6 +7,7 @@ export interface Customer {
     password: string;
     role?: string;
     resetCode?: string;
+
 }
 
 

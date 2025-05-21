@@ -1,14 +1,17 @@
+// ProductDetail.tsx
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import React, {useEffect, useState} from "react";
 import formatToVND from "../hooks/formatToVND";
-import Breadcrumb from "../components/Breadcrumb";
 import {useParams} from "react-router-dom";
 import {getProductById} from "../server/api/product/product.get";
 import {Product} from "../models/Product";
+import useCartItem from "../hooks/useCartItem";
+import {CartItemRequest} from "../models/request/CartItemRequest";
+import {getUser} from "../server/api/customers/customer.get";
+import Notification from "../components/Notification"; // Đảm bảo bạn import component Notification
 
 const ProductDetail = () => {
-    // Lưu số lượng đánh giá cho từng sao (5 sao, 4 sao, ...)
     type Ratings = {
         [key: number]: number;
     };
@@ -21,7 +24,6 @@ const ProductDetail = () => {
         1: 0,
     });
 
-    // Mảng đánh giá sản phẩm (bao gồm số sao và nội dung)
     const [reviews, setReviews] = useState([
         {stars: 5, content: "Sản phẩm tuyệt vời, rất đáng mua!"},
         {stars: 4, content: "Chất lượng tốt nhưng có thể cải thiện."},
@@ -29,27 +31,36 @@ const ProductDetail = () => {
         {stars: 3, content: "Sản phẩm trung bình, không như mong đợi."},
     ]);
 
-    const [newRating, setNewRating] = useState(0); // Lưu rating mới của người dùng
     const [reviewText, setReviewText] = useState(""); // Lưu mô tả đánh giá
-    const totalRatings = Object.values(ratings).reduce((a, b) => a + b, 0); // Tính tổng số đánh giá
+    const {id} = useParams<{ id: string }>();
+    const [product, setProduct] = useState<Product>();
+    const [loading, setLoading] = useState(true);
+    const {fetchSaveCartItem} = useCartItem();
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState("");
+    const [notificationType, setNotificationType] = useState<"success" | "error">("success");
 
-    // Hàm xử lý khi người dùng gửi đánh giá mới
+    // Hàm hiển thị thông báo
+    const showSuccessNotification = (message: string) => {
+        setNotificationMessage(message);
+        setNotificationType("success");
+        setShowNotification(true);
+
+        // Đặt thời gian đóng tự động sau 3 giây
+        setTimeout(() => {
+            setShowNotification(false);
+        }, 3000);
+    };
+
     const handleReviewSubmit = () => {
         if (reviewText.trim() === "") {
             alert("Vui lòng viết đánh giá");
             return;
         }
-
-        // Thêm đánh giá mới vào mảng reviews
         setReviews([...reviews, {stars: 5, content: reviewText}]);
-
-        // Reset form sau khi gửi
         setReviewText("");
         alert("Đánh giá của bạn đã được gửi!");
     };
-    const {id} = useParams<{ id: string }>(); // Lấy id từ URL
-    const [product, setProduct] = useState<Product>();
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (id) {
@@ -65,27 +76,53 @@ const ProductDetail = () => {
         }
     }, [id]);
 
+    const handleAddToCart = async () => {
+        if (!product) return;
+
+        try {
+            const user = await getUser();
+            if (!user?.cartId) {
+                return;
+            }
+
+            const cartItem: CartItemRequest = {
+                cartId: user.cartId,
+                productId: product.id,
+                quantity: 1,
+            };
+
+            await fetchSaveCartItem(cartItem);
+            showSuccessNotification("Sản phẩm đã được thêm vào giỏ hàng!");
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <>
             <Header/>
             <div className="bg-gray-100">
                 <div className="sm:px-10 md:px-20 lg:px-28">
+                    {showNotification && (
+                        <Notification
+                            message={notificationMessage}
+                            type={notificationType}
+                            onClose={() => setShowNotification(false)}
+                        />
+                    )}
                     <div className="flex flex-row">
-                        {/* Ảnh sản phẩm */}
                         <div className="w-1/2 p-4">
                             <img
                                 src={product?.img || "https://via.placeholder.com/400x400?text=No+Image"}
                                 alt={product?.name}
                                 className="w-full h-auto mb-4"
                             />
-                            {/* Mô tả sản phẩm */}
                             <div className="mt-4 bg-white p-4">
                                 <h3 className="text-xl font-semibold">Mô tả sản phẩm:</h3>
                                 <p className="text-gray-700 mt-2">{product?.detail || "Chưa có mô tả"}</p>
                             </div>
                         </div>
 
-                        {/* Thông tin sản phẩm và nút */}
                         <div className="w-1/2 p-4">
                             <div className="bg-white p-2 px-4">
                                 <h2 className="text-2xl font-bold mb-4">{product?.name}</h2>
@@ -96,12 +133,12 @@ const ProductDetail = () => {
                                     <span className="bg-red-500 rounded-md h-4 px-2 py-1 text-white text-xs pb-6 ml-10">
                                         {product?.discount ? `${(product?.discount * 100).toFixed(0)} %` : "0 %"}
                                     </span>
-
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                                     <button
-                                        className="w-full sm:w-auto flex-1 px-4 sm:px-6 py-2 border-2 border-red-500 font-semibold text-red-400 rounded-md text-center break-words whitespace-normal text-sm sm:text-base">
+                                        onClick={handleAddToCart}
+                                        className="w-full sm:w-auto flex-1 px-4 sm:px-6 py-2 border-2 border-red-500 font-semibold text-red-400 rounded-md text-center break-words whitespace-normal text-sm sm:text-base hover:bg-red-200">
                                         Thêm vào giỏ hàng
                                     </button>
                                     <button
@@ -109,11 +146,8 @@ const ProductDetail = () => {
                                         Mua ngay
                                     </button>
                                 </div>
-
-
                             </div>
 
-                            {/* Thông tin ưu đãi */}
                             <div className="bg-white p-4 mb-4 mt-4">
                                 <p className="text-sm text-gray-700">
                                     <strong>Chính sách ưu đãi:</strong>
@@ -125,7 +159,6 @@ const ProductDetail = () => {
                                 </ul>
                             </div>
 
-                            {/* Thông tin chi tiết sản phẩm */}
                             <div className="space-y-4 p-4 bg-white">
                                 <div className="flex justify-between border-b pb-2">
                                     <strong>Mã hàng: </strong>
@@ -168,7 +201,6 @@ const ProductDetail = () => {
                     </div>
                 </div>
 
-                {/* Đánh giá sản phẩm */}
                 <div className="py-4 sm:px-10 md:px-20 lg:px-36 xl:px-48">
                     <div className="flex justify-between bg-white p-6 rounded-lg shadow-md px-10">
                         {/* Form đánh giá */}
@@ -191,21 +223,16 @@ const ProductDetail = () => {
                                 Gửi đánh giá
                             </button>
                         </div>
-                        {/* Hiển thị các đánh giá đã có */}
                         <div className="space-y-4 w-82 px-6 ml-20 mt-6">
                             {reviews.map((review, index) => (
                                 <div key={index} className="border-b py-4">
-                                    {/* Hiển thị nội dung đánh giá */}
                                     <p className="mt-2 text-gray-700">{review.content}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
-
-
                 </div>
             </div>
-
             <Footer/>
         </>
     );

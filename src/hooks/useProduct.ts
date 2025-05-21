@@ -1,6 +1,12 @@
 import {useState} from "react";
 import {Product} from "../models/Product";
-import {getListProduct, getProductById, getProductSale} from "../server/api/product/product.get";
+import {
+    getListProduct,
+    getProductById,
+    getProductSale,
+    listFindByName,
+    searchProduct
+} from "../server/api/product/product.get";
 import {ProductResponse} from "../models/response/ProductResponse";
 
 function useProduct() {
@@ -54,6 +60,30 @@ function useProduct() {
         }
     }
 
+    const fetchSearchProductByName = async (name: string): Promise<Product[]> => {
+        setLoading(true);
+        try {
+            return await searchProduct(name);
+        } catch (error) {
+            handleError(error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchListFindByName  = async (name: string): Promise<Product[]> => {
+        setLoading(true);
+        try {
+            return await listFindByName(name);
+        } catch (error) {
+            handleError(error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return {
         products,
         error,
@@ -63,6 +93,8 @@ function useProduct() {
         setProducts,
         fetchGetListProductSale,
         saleProducts, setSaleProducts,
+        fetchSearchProductByName,
+        fetchListFindByName,
     };
 }
 

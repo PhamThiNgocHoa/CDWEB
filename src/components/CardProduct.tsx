@@ -13,7 +13,7 @@ interface ProductProps {
 
 const CardProduct: React.FC<ProductProps> = (props) => {
     return (
-        <div className="cursor-pointer w-64 bg-white rounded-lg border border-gray-300 shadow-lg p-2 py-4"
+        <div className="cursor-pointer bg-white rounded-lg border border-gray-300 shadow-lg p-2 py-4"
              onClick={props.onClick}
         >
             {/* Hình ảnh sản phẩm */}
@@ -53,6 +53,10 @@ const CardProduct: React.FC<ProductProps> = (props) => {
 
                 </div>
             </div>
+            <button className="w-full bg-red-600 text-white p-2 rounded-md mt-4">Thêm
+                vào
+                giỏ
+            </button>
         </div>
     );
 };
