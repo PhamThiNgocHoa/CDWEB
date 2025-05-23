@@ -7,7 +7,6 @@ import Nav from "../../components/Nav";
 import CategoryList from "../../components/user/CategoryList";
 import Footer from "../../components/Footer";
 import {checkTokenExpiration} from "../../server/api/authentication/auth.post"; // Import hàm kiểm tra token
-import Error from "../../components/Error";
 import CardProduct from "../../components/CardProduct";
 import useCategory from "../../hooks/useCategory";
 import ListCategory from "../../components/ListCategory";
@@ -40,12 +39,9 @@ const navItems = [
 
 const Home = () => {
     const navigate = useNavigate();
-    const [isErrorVisible, setIsErrorVisible] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const token = localStorage.getItem("authToken");
     const {fetchGetListCategory, categories, setCategories} = useCategory();
 
-    const handleProductClick = (id: number) => {
+    const handleProductClick = (id: string) => {
         navigate(`/productDetail/${id}`);
     };
     const {
@@ -58,16 +54,6 @@ const Home = () => {
     } = useProduct();
 
     const [showAllProducts, setShowAllProducts] = useState(false);  // state mới để kiểm soát số lượng sản phẩm hiển thị
-
-    useEffect(() => {
-        const checkExpiration = async () => {
-            if (token) {
-                const f = await checkTokenExpiration(token);
-            }
-        };
-
-        checkExpiration();
-    }, [token, navigate]);
 
     useEffect(() => {
         const getListCategory = async () => {
@@ -92,11 +78,6 @@ const Home = () => {
         }
         getListProductSale();
     }, []);
-
-    const closeError = () => {
-        setIsErrorVisible(false);
-        navigate("/login");
-    };
 
     const toggleShowAllProducts = () => {
         setShowAllProducts(!showAllProducts);  // Thay đổi trạng thái khi nhấn nút "Xem thêm"
@@ -188,7 +169,6 @@ const Home = () => {
                 </div>
             </div>
             <Footer/>
-            {isErrorVisible && <Error message={errorMessage} onClose={closeError}/>}
         </>
     );
 };

@@ -2,13 +2,14 @@ import React, {useState, useEffect} from 'react';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import {CartItemResponse} from "../models/response/CartItemResponse";
-import ProductList from "../components/ProductList";  // Import kiểu dữ liệu CartItemResponse
+import ProductList from "../components/ProductList";
+import {OrderMethod, OrderMethodDisplayName} from "../enums/OrderMethod";
+import formatToVND from "../hooks/formatToVND";  // Import kiểu dữ liệu CartItemResponse
 
 const Checkout: React.FC = () => {
-    // Trạng thái địa chỉ giao hàng, hình thức thanh toán và các trường khác
     const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
     const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState<'vnpay' | 'cash-on-delivery'>('cash-on-delivery');
+    const [paymentMethod, setPaymentMethod] = useState<OrderMethod>(OrderMethod.COD);
     const [receiverName, setReceiverName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [houseNumber, setHouseNumber] = useState('');
@@ -36,27 +37,21 @@ const Checkout: React.FC = () => {
         },
     ]);
 
-    // Trạng thái để lưu địa chỉ đã chọn
     const [selectedAddress, setSelectedAddress] = useState<any>(null);
 
-    // Xử lý chọn địa chỉ
     const handleAddressSelect = (address: any) => {
         setSelectedAddress(address);
     };
 
-    // Xử lý xóa địa chỉ
     const handleDeleteAddress = (id: number) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-            // Xóa địa chỉ trong danh sách
             setSavedAddresses(savedAddresses.filter((address) => address.id !== id));
-            // Nếu xóa địa chỉ đang được chọn, bỏ chọn
             if (selectedAddress?.id === id) {
                 setSelectedAddress(null);
             }
         }
     };
 
-    // Lấy danh sách tỉnh thành
     useEffect(() => {
         const fetchProvinces = async () => {
             try {
@@ -71,7 +66,6 @@ const Checkout: React.FC = () => {
         fetchProvinces();
     }, []);
 
-    // Lấy danh sách quận huyện theo tỉnh
     useEffect(() => {
         if (selectedProvince) {
             const fetchDistricts = async () => {
@@ -90,13 +84,20 @@ const Checkout: React.FC = () => {
         }
     }, [selectedProvince]);
 
-    // Giả lập sản phẩm trong giỏ hàng để test
+    useEffect(() => {
+        const provinceName = provinces.find(p => p.code === Number(selectedProvince))?.name || '';
+        const districtName = districts.find(d => d.code === Number(selectedDistrict))?.name || '';
+        const fullAddress = `${houseNumber ? houseNumber + ', ' : ''}${districtName ? districtName + ', ' : ''}${provinceName}`;
+        setAddress(fullAddress)
+    }, [selectedProvince, selectedDistrict, provinces, districts, houseNumber]);
+
+
     useEffect(() => {
         const sampleCartItems: CartItemResponse[] = [
             {
                 id: 1,
                 product: {
-                    id: 101,
+                    id: "101",
                     name: "Áo Thun Nam",
                     price: 200000,
                     img: "https://cdn0.fahasa.com/media/catalog/product//i/m/image_195509_1_33297.jpg"
@@ -106,7 +107,7 @@ const Checkout: React.FC = () => {
             {
                 id: 2,
                 product: {
-                    id: 102,
+                    id: "102",
                     name: "Quần Jeans",
                     price: 350000,
                     img: "https://cdn0.fahasa.com/media/catalog/product//i/m/image_195509_1_33297.jpg"
@@ -118,12 +119,6 @@ const Checkout: React.FC = () => {
         setCartItems(sampleCartItems);
     }, []);
 
-    // Xử lý thay đổi phương thức thanh toán
-    const handlePaymentMethodChange = (method: 'vnpay' | 'cash-on-delivery') => {
-        setPaymentMethod(method);
-    };
-
-    // Áp dụng mã giảm giá
     const handleApplyDiscount = () => {
         console.log('Áp dụng mã giảm giá:', discountCode);
     };
@@ -159,29 +154,41 @@ const Checkout: React.FC = () => {
                             </div>
 
                             {selectedProvince && (
-                                <div className="mb-2">
-                                    <select
-                                        className="w-full p-2 border border-gray-300 rounded-md"
-                                        value={selectedDistrict || ''}
-                                        onChange={(e) => setSelectedDistrict(e.target.value)}
-                                    >
-                                        <option value="">Chọn quận huyện</option>
-                                        {districts.map((district: any) => (
-                                            <option key={district.code} value={district.code}>
-                                                {district.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <>
+                                    <div className="mb-2">
+                                        <select
+                                            className="w-full p-2 border border-gray-300 rounded-md"
+                                            value={selectedDistrict || ''}
+                                            onChange={(e) => setSelectedDistrict(e.target.value)}
+                                        >
+                                            <option value="">Chọn quận huyện</option>
+                                            {districts.map((district: any) => (
+                                                <option key={district.code} value={district.code}>
+                                                    {district.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+
+                                    <input
+                                        type="text"
+                                        placeholder="Số nhà (nếu có)"
+                                        value={houseNumber}
+                                        onChange={(e) => setHouseNumber(e.target.value)}
+                                        className="w-full p-2 border border-gray-300 rounded-md mb-2"
+                                    />
+
+                                    <input
+                                        type="text"
+                                        placeholder="Tỉnh, Quận đã chọn"
+                                        value={address}
+                                        readOnly
+                                        className="w-full p-2 border border-gray-300 rounded-md mb-2"
+                                    />
+                                </>
                             )}
 
-                            <input
-                                type="text"
-                                placeholder="Số nhà (nếu có)"
-                                value={houseNumber}
-                                onChange={(e) => setHouseNumber(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded-md mb-2"
-                            />
 
                             <input
                                 type="text"
@@ -205,13 +212,15 @@ const Checkout: React.FC = () => {
                             <h3 className="font-medium text-lg mb-2">Chọn địa chỉ giao hàng đã lưu</h3>
                             <div className="space-y-4">
                                 {savedAddresses.map((address) => (
-                                    <div key={address.id} className="border p-4 rounded-lg shadow-md">
+                                    <div key={address.id} className="flex flex-row border p-4 rounded-lg shadow-md">
                                         <input
-                                            type="radio"
+                                            type="checkbox"
                                             name="selectedAddress"
                                             checked={selectedAddress?.id === address.id}
                                             onChange={() => handleAddressSelect(address)}
-                                            className="mr-4"
+                                            className="mr-4 w-4 h-4"
+                                            style={{accentColor: "red"}}
+
                                         />
                                         <div>
                                             <p><strong>Tên người nhận:</strong> {address.name}</p>
@@ -260,37 +269,27 @@ const Checkout: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Chọn hình thức thanh toán */}
                         <div className="bg-white p-4">
-                            <h3 className="font-medium text-lg mb-2">Chọn hình thức thanh toán</h3>
-                            <div className="flex space-x-4">
-                                <label>
+                            <h3 className="font-medium text-lg mb-2">Phương thức thanh toán</h3>
+                            {Object.values(OrderMethod).map((method) => (
+                                <label key={method} className="block mb-2">
                                     <input
-                                        type="radio"
+                                        type="checkbox"
                                         name="paymentMethod"
-                                        value="vnpay"
-                                        checked={paymentMethod === 'vnpay'}
-                                        onChange={() => handlePaymentMethodChange('vnpay')}
-                                        className="mr-2"
+                                        value={method}
+                                        checked={paymentMethod === method}
+                                        onChange={() => setPaymentMethod(method)}
+                                        style={{accentColor: "red"}}
+                                        className="mr-2 w-4 h-4"
                                     />
-                                    Thanh toán qua VNPay
+                                    {OrderMethodDisplayName[method]}
                                 </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        value="cash-on-delivery"
-                                        checked={paymentMethod === 'cash-on-delivery'}
-                                        onChange={() => handlePaymentMethodChange('cash-on-delivery')}
-                                        className="mr-2"
-                                    />
-                                    Thanh toán khi nhận hàng
-                                </label>
-                            </div>
+                            ))}
                         </div>
+
+
                     </div>
 
-                    {/* Kiểm tra lại đơn hàng */}
                     <div className="mb-6 bg-white p-4">
                         <h3 className="font-medium text-lg mb-2">Kiểm tra lại đơn hàng</h3>
                         <div className="grid grid-cols-1 gap-8">
@@ -307,24 +306,23 @@ const Checkout: React.FC = () => {
                                             {/* Tên sản phẩm */}
                                             <h4 className="font-medium text-lg mb-2">{item.product.name}</h4>
                                             {/* Giá sản phẩm */}
-                                            <p className="text-gray-600">Giá: {item.product.price} VNĐ</p>
+                                            <p className="text-gray-600">Giá: {formatToVND(item.product.price)}</p>
                                             {/* Số lượng sản phẩm */}
                                             <p className="text-gray-600">Số lượng: {item.quantity}</p>
                                         </div>
                                         {/* Tổng tiền cho sản phẩm */}
                                         <div>
-                                            <p className="font-semibold">Tổng: {item.product.price * item.quantity} VNĐ</p>
+                                            <p className="font-semibold">Tổng: {formatToVND(item.product.price * item.quantity)}</p>
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <div className="text-right mt-4">
-                            <p className="text-lg font-semibold">Tổng cộng: {totalAmount} VNĐ</p>
+                            <p className="text-lg font-semibold">Tổng cộng: {formatToVND(totalAmount)}</p>
                         </div>
                     </div>
 
-                    {/* Nút thanh toán */}
                     <div className="text-center">
                         <button className="bg-red-500 text-white px-6 py-3 rounded-md">
                             Xác nhận thanh toán

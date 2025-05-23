@@ -2,12 +2,12 @@ import React from 'react';
 import {formatToVND} from "../hooks/formatToVND";
 
 interface ProductProps {
-    id: number;
+    id: string;
     name: string;
     img: string;
     price: number;
     discount?: number;
-    quantitySold: number;
+    quantitySold?: number;
     onClick: () => void;
 }
 
@@ -27,7 +27,7 @@ const CardProduct: React.FC<ProductProps> = (props) => {
 
             {/* Giá sản phẩm */}
             <div className="flex flex-row w-full justify-between gap-2 mt-2">
-                <span className="text-red-500 font-bold">{formatToVND(props.price * 1000)} VND</span>
+                <span className="text-red-500 font-bold">{formatToVND(props.price)}</span>
                 <span className="bg-red-500 p-1 rounded-md text-white text-xs">
                     {(props.discount ? props.discount * 100 : 0)} %
                 </span>

@@ -16,14 +16,22 @@ export const useAuth = () => {
         }
     };
 
-    const fetchCheckTokenExpiration = async (token: string)=>{
-        try {
-            await checkTokenExpiration(token);
-        }catch (error:any){
-            console.log("Error:", error.message);
-            throw new Error("Login failed");
-        }
-    }
+    useEffect(() => {
+        const token = localStorage.getItem("token");
 
-    return { isLoggedIn, handleLogout, setIsLoggedIn, fetchCheckTokenExpiration };
+        const verifyToken = async () => {
+            if (token) {
+                const isValid = await checkTokenExpiration(token);
+                if (!isValid) {
+                    alert("Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.");
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                }
+            }
+        };
+
+        verifyToken();
+    }, []);
+
+    return { isLoggedIn, handleLogout, setIsLoggedIn };
 };

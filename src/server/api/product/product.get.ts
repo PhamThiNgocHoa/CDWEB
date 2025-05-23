@@ -3,7 +3,7 @@ import ApiService from "../ApiService";
 import {Category} from "../../../models/Category";
 import {ProductResponse} from "../../../models/response/ProductResponse";
 
-export const getProductById = async (productId: number): Promise<Product> => {
+export const getProductById = async (productId: string): Promise<Product> => {
     const result = await ApiService.get(`/api/product/${productId}`);
     return result.data;
 }

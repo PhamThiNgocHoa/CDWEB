@@ -61,12 +61,15 @@ export const authenticate = async (
 ): Promise<IntrospectResponse> => {
     return await ApiService.post("/api/auth/introspect", request);
 };
-export const checkTokenExpiration = async (token: string) => {
+export const checkTokenExpiration = async (token: string): Promise<boolean> => {
     try {
         const response = await ApiService.post(`/api/auth/checkTokenExpiration/${token}`, {}, {}, false);
+        return response.data as boolean;
     } catch (error: any) {
-        throw new Error("checkTokenExpiration failed");
+        console.error("checkTokenExpiration failed", error);
+        return false; // hoặc tùy logic của bạn
     }
 };
+
 
 

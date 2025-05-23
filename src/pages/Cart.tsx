@@ -141,7 +141,7 @@ const Cart = () => {
                             <div className="flex justify-between mb-4">
                                 <span className="text-lg">Tổng Số Tiền (gồm VAT)</span>
                                 <span className="text-xl text-red-500 font-bold">
-                                    {formatToVND(calculateTotal() * 1000)} VND
+                                    {formatToVND(calculateTotal())}
                                 </span>
                             </div>
                             <button className="w-full py-3 bg-red-500 text-white rounded-md">THANH TOÁN</button>

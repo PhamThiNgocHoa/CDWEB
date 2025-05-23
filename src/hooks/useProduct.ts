@@ -36,7 +36,7 @@ function useProduct() {
         }
     };
 
-    const fetchGetProductById = async (id: number): Promise<Product | null> => {
+    const fetchGetProductById = async (id: string): Promise<Product | null> => {
         setLoading(true);
         try {
             return await getProductById(id);

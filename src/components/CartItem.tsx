@@ -64,7 +64,7 @@ const CartItem: React.FC<CartItemProps> = ({item, onQuantityChange, onRemove, on
                             </p>
                         )}
                         <p className="font-semibold text-red-500 mr-4 pt-1">
-                            {formatToVND(item.price * item.quantity * 1000)} VND
+                            {formatToVND(item.price * item.quantity )}
                         </p>
                         <button
                             className="text-red-500 mt-2 hover:text-red-700 transition"
