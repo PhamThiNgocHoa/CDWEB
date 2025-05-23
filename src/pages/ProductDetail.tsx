@@ -64,7 +64,7 @@ const ProductDetail = () => {
 
     useEffect(() => {
         if (id) {
-            const productId = parseInt(id, 10);
+            const productId = id;
             getProductById(productId)
                 .then((data) => {
                     setProduct(data);
@@ -128,7 +128,7 @@ const ProductDetail = () => {
                                 <h2 className="text-2xl font-bold mb-4">{product?.name}</h2>
                                 <div className="flex">
                                   <span className="text-xl text-red-500 mb-4 font-bold">
-                                    {formatToVND((product?.price ?? 0) * 1000)} VND
+                                    {formatToVND((product?.price ?? 0))}
                                   </span>
                                     <span className="bg-red-500 rounded-md h-4 px-2 py-1 text-white text-xs pb-6 ml-10">
                                         {product?.discount ? `${(product?.discount * 100).toFixed(0)} %` : "0 %"}

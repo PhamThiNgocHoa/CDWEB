@@ -1,8 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import useUsers from "../hooks/useCustomer";
 import {useNavigate} from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import {useAuth} from "../hooks/useAuth";
+import {checkTokenExpiration} from "../server/api/authentication/auth.post";
 
 function Login() {
     const {handleLogin} = useUsers();
@@ -23,6 +25,7 @@ function Login() {
             console.error("Login failed:", err);
         }
     };
+
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">

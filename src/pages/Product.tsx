@@ -71,12 +71,12 @@ const Product = () => {
 
                             <div className="col-span-3">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    <CardProduct id={1} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
+                                    <CardProduct id={"1"} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
                                                  onClick={() => handleProductClick(1)}/>
-                                    <CardProduct id={1} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
+                                    <CardProduct id={"1"} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
                                                  onClick={() => handleProductClick(1)}/>
 
-                                    <CardProduct id={1} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
+                                    <CardProduct id={"1"} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
                                                  onClick={() => handleProductClick(1)}/>
 
                                 </div>

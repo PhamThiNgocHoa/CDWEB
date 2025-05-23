@@ -3,16 +3,17 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart, faReceipt, faSignOut, faUser, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
 import IconTextItem from "./IconTextItem";
 import {useAuth} from "../hooks/useAuth";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import useProduct from "../hooks/useProduct"; // Import hook để fetch sản phẩm
 import {Product} from "../models/Product"; // Import kiểu Product
 
 function Header() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);  // Quản lý việc mở/đóng menu
-    const [searchQuery, setSearchQuery] = useState(""); // Trạng thái cho ô tìm kiếm
-    const [suggestions, setSuggestions] = useState<Product[]>([]); // Khai báo kiểu cho suggestions là Product[]
-    const {isLoggedIn, handleLogout, setIsLoggedIn} = useAuth();  // Lấy trạng thái đăng nhập và hàm đăng xuất từ useAuth hook
-    const {fetchListFindByName} = useProduct();  // Hook tìm kiếm sản phẩm
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [suggestions, setSuggestions] = useState<Product[]>([]);
+    const {isLoggedIn, handleLogout, setIsLoggedIn} = useAuth();
+    const {fetchListFindByName} = useProduct();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("authToken");
@@ -23,22 +24,28 @@ function Header() {
         }
     }, [isLoggedIn]);
 
-    // Hàm tìm kiếm khi người dùng nhập vào ô input
     const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
         setSearchQuery(query);
 
         if (query.length > 0) {
             const result = await fetchListFindByName(query);
-            setSuggestions(result); // Cập nhật suggestions với kết quả từ API
+            setSuggestions(result);
         } else {
-            setSuggestions([]); // Nếu không có tìm kiếm, xóa gợi ý
+            setSuggestions([]);
         }
     };
 
     const toggleMenu = () => {
-        setIsMenuOpen(prev => !prev);  // Lật trạng thái của menu khi click
+        setIsMenuOpen(prev => !prev);
     };
+
+    const handClick = async () => {
+        if (searchQuery !== " ") {
+            navigate(`/searchProduct/${encodeURIComponent(searchQuery)}`);
+        }
+    }
+
 
     return (
         <header>
@@ -65,14 +72,15 @@ function Header() {
                         placeholder="Tìm kiếm..."
                         className="w-full p-2 focus:outline-none text-sm sm:text-base"
                     />
-                    <button className="bg-red-500 text-white rounded-lg p-2 ml-2 hover:bg-red-300 focus:outline-none">
+                    <button className="bg-red-500 text-white rounded-lg p-2 ml-2 hover:bg-red-300 focus:outline-none"
+                            onClick={handClick}>
                         <i className="fas fa-search"></i>
                     </button>
                     {/* Hiển thị gợi ý tìm kiếm */}
                     {suggestions.length > 0 && (
                         <div
                             className="absolute top-14 left-0 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
-                            {suggestions.slice(0, 5).map((product: Product) => (
+                            {suggestions.map((product: Product) => (
                                 <div key={product.id} className="p-2 hover:bg-gray-200 cursor-pointer">
                                     <Link to={`/productDetail/${product.id}`} className="flex items-center">
                                         <img
