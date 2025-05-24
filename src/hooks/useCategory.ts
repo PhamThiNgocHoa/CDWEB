@@ -1,6 +1,7 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Category} from "../models/Category";
 import {getCategoryById, getListCategory} from "../server/api/category/category.get";
+import {getListProduct} from "../server/api/product/product.get";
 
 // Hook sử dụng cho Category
 function useCategory() {
@@ -15,18 +16,13 @@ function useCategory() {
         throw new Error(message);
     };
 
-    const fetchGetListCategory = async (): Promise<Category[]> => {
-        try {
-            const data = await getListCategory();
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getListCategory()
             setCategories(data);
-            return data;
-        } catch (error) {
-            handleError(error);
-            return [];
-        } finally {
-            setLoading(false);
         }
-    };
+        fetchData();
+    }, [getListCategory]);
 
     const fetchGetCategoryById = async (id: number): Promise<Category | null> => {
         try {
@@ -42,7 +38,6 @@ function useCategory() {
     return {
         categories,
         error,
-        fetchGetListCategory,
         fetchGetCategoryById,
         setCategories,
     };

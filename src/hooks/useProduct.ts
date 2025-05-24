@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Product} from "../models/Product";
 import {
     getListProduct,
@@ -7,7 +7,6 @@ import {
     listFindByName,
     searchProduct
 } from "../server/api/product/product.get";
-import {ProductResponse} from "../models/response/ProductResponse";
 
 function useProduct() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -22,19 +21,22 @@ function useProduct() {
         throw new Error(message);
     };
 
-    const fetchGetListProduct = async (): Promise<ProductResponse[]> => {
-        setLoading(true);
-        try {
-            const data = await getListProduct();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getListProduct()
             setProducts(data);
-            return data;
-        } catch (error) {
-            handleError(error);
-            return [];
-        } finally {
-            setLoading(false);
         }
-    };
+        fetchData();
+    }, [getListProduct]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getProductSale()
+            setSaleProducts(data);
+        }
+        fetchData();
+    }, [getProductSale]);
 
     const fetchGetProductById = async (id: string): Promise<Product | null> => {
         setLoading(true);
@@ -48,17 +50,6 @@ function useProduct() {
         }
     };
 
-    const fetchGetListProductSale = async (): Promise<ProductResponse[]> => {
-        setLoading(true);
-        try {
-            return await getProductSale();
-        } catch (error) {
-            handleError(error);
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    }
 
     const fetchSearchProductByName = async (name: string): Promise<Product[]> => {
         setLoading(true);
@@ -72,7 +63,7 @@ function useProduct() {
         }
     }
 
-    const fetchListFindByName  = async (name: string): Promise<Product[]> => {
+    const fetchListFindByName = async (name: string): Promise<Product[]> => {
         setLoading(true);
         try {
             return await listFindByName(name);
@@ -88,10 +79,8 @@ function useProduct() {
         products,
         error,
         loading,
-        fetchGetListProduct,
         fetchGetProductById,
         setProducts,
-        fetchGetListProductSale,
         saleProducts, setSaleProducts,
         fetchSearchProductByName,
         fetchListFindByName,

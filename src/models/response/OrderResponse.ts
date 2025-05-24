@@ -4,7 +4,7 @@ import {OrderDetailResponse} from "./OrderDetailResponse";
 
 
 export interface OrderResponse {
-    id: number;
+    id: string;
     customerDTO: CustomerResponse;
     orderDate: string;
     totalAmount: number;

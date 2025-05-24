@@ -2,12 +2,21 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CardProduct from "../components/CardProduct";
 import {useNavigate} from "react-router-dom";
+import useProduct from "../hooks/useProduct";
+import useCategory from "../hooks/useCategory";
+import {useState} from "react";
+import {BookForm, BookFormDisplayName} from "../enums/BookForm";
 
 const Product = () => {
     const navigate = useNavigate();
-    const handleProductClick = (id: number) => {
+    const {products} = useProduct();
+    const [form, setForm] = useState<BookForm>()
+    const {categories} = useCategory();
+    const handleProductClick = (id: string) => {
         navigate(`/productDetail/${id}`);
     };
+
+
     return (
         <>
             <Header/>
@@ -21,28 +30,27 @@ const Product = () => {
                                     <h3 className="font-medium text-lg mb-2">Danh mục sản phẩm</h3>
                                     <select id="category" className="w-full p-2 border border-gray-300 rounded-md">
                                         <option value="">Chọn danh mục</option>
-                                        <option value="1">Điện thoại</option>
-                                        <option value="2">Laptop</option>
-                                        <option value="3">Tai nghe</option>
+                                        {categories.map((categories) => (
+                                            <option key={categories.id} value={categories.id}>{categories.name}</option>
+                                        ))}
                                     </select>
-                                </div>
 
-                                <div className="mb-6">
-                                    <h3 className="font-medium text-lg mb-2">Ngôn ngữ</h3>
-                                    <select id="language" className="w-full p-2 border border-gray-300 rounded-md">
-                                        <option value="">Chọn ngôn ngữ</option>
-                                        <option value="vi">Tiếng Việt</option>
-                                        <option value="en">Tiếng Anh</option>
-                                        <option value="ja">Tiếng Nhật</option>
-                                    </select>
                                 </div>
 
                                 <div className="mb-6">
                                     <h3 className="font-medium text-lg mb-2">Hình thức</h3>
-                                    <select id="form" className="w-full p-2 border border-gray-300 rounded-md">
+                                    <select
+                                        id="form"
+                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        value={form ?? ""}
+                                        onChange={(e) => setForm(e.target.value as BookForm)}
+                                    >
                                         <option value="">Chọn hình thức</option>
-                                        <option value="new">Mới</option>
-                                        <option value="used">Cũ</option>
+                                        {Object.entries(BookFormDisplayName).map(([key, label]) => (
+                                            <option key={key} value={key}>
+                                                {label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -55,11 +63,11 @@ const Product = () => {
                                             id="priceRangeSelect"
                                             className="px-4 py-2 border border-gray-300 rounded-md"
                                         >
-                                            <option value="0-1000">0 - 1000 VNĐ</option>
-                                            <option value="1000-2000">1000 - 2000 VNĐ</option>
-                                            <option value="2000-5000">2000 - 5000 VNĐ</option>
-                                            <option value="5000-10000">5000 - 10000 VNĐ</option>
-                                            <option value="10000-20000">10000 - 20000 VNĐ</option>
+                                            <option value="0-1000">0 - 100.000 VNĐ</option>
+                                            <option value="1000-2000">100.000 - 300.000 VNĐ</option>
+                                            <option value="2000-5000">300.000 - 600.000 VNĐ</option>
+                                            <option value="5000-10000">600.000 - 10.000.000 VNĐ</option>
+                                            <option value="10000-20000"> Lớn hơn 1.000.000 VNĐ</option>
                                         </select>
                                     </div>
                                 </div>
@@ -71,14 +79,17 @@ const Product = () => {
 
                             <div className="col-span-3">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    <CardProduct id={"1"} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
-                                                 onClick={() => handleProductClick(1)}/>
-                                    <CardProduct id={"1"} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
-                                                 onClick={() => handleProductClick(1)}/>
-
-                                    <CardProduct id={"1"} name={"KKKKK"} img={"FFFF"} price={100} quantitySold={5}
-                                                 onClick={() => handleProductClick(1)}/>
-
+                                    {products.map((product) => (
+                                        <CardProduct
+                                            key={product.id}
+                                            id={product.id}
+                                            name={product.name}
+                                            img={product.img}
+                                            price={product.price}
+                                            quantitySold={10}
+                                            onClick={() => handleProductClick(product.id)}
+                                        />
+                                    ))}
                                 </div>
                             </div>
                         </div>

@@ -1,11 +1,11 @@
 export interface CustomerResponse {
-    id?: number;
+    id?: string;
     fullname: string;
     email: string;
     phone: string;
     username: string;
     role?: string;
-    cartId: number;
+    cartId: string;
 }
 
 

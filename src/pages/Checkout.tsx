@@ -95,7 +95,7 @@ const Checkout: React.FC = () => {
     useEffect(() => {
         const sampleCartItems: CartItemResponse[] = [
             {
-                id: 1,
+                id: "1",
                 product: {
                     id: "101",
                     name: "Áo Thun Nam",
@@ -105,7 +105,7 @@ const Checkout: React.FC = () => {
                 quantity: 2
             },
             {
-                id: 2,
+                id: "2",
                 product: {
                     id: "102",
                     name: "Quần Jeans",

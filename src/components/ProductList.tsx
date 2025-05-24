@@ -3,10 +3,8 @@ import React, {useEffect} from "react";
 import CardProduct from "./CardProduct";
 
 const ProductList = () => {
-    const {products, error, fetchGetListProduct} = useProduct();
-    useEffect(() => {
-        fetchGetListProduct();
-    }, [fetchGetListProduct]);
+    const {products, error} = useProduct();
+
     if (error) {
         return <div style={{color: "red"}}>{error}</div>;
     }

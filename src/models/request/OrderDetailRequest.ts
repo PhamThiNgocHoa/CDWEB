@@ -1,4 +1,4 @@
 export interface OrderDetailRequest {
-    productId: number;
+    productId: string;
     quantity: number;
 }

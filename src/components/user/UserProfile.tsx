@@ -12,7 +12,7 @@ const UserProfile = () => {
     const {fetchUpdateCustomer, user} = useCustomer();
 
 // State cho cập nhật thông tin
-    const [editUserId, setEditUserId] = useState<number>(0);
+    const [editUserId, setEditUserId] = useState<string>();
     const [editFullname, setEditFullname] = useState('');
     const [editEmail, setEditEmail] = useState('');
     const [editPhone, setEditPhone] = useState('');
@@ -196,7 +196,7 @@ const UserProfile = () => {
                 type="number"
                 placeholder="User ID"
                 value={id}
-                onChange={(e) => setEditUserId(parseInt(e.target.value))}
+                onChange={(e) => setEditUserId((e.target.value))}
             />
             <input
                 type="text"

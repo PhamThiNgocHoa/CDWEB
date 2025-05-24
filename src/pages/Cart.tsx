@@ -9,8 +9,10 @@ import useCartItem from "../hooks/useCartItem";
 import {CartItemRequest} from "../models/request/CartItemRequest";
 
 const Cart = () => {
+
     const tokenData = getCurrentUserId();
     const customerId = tokenData || null;
+    const {fetchCart} = useCart(customerId);
 
     const {cartData, loading, error} = useCart(customerId);
 
@@ -31,14 +33,14 @@ const Cart = () => {
         }
     }, [cartData]);
 
-    const handleSelect = (id: number, isChecked: boolean) => {
+    const handleSelect = (id: string, isChecked: boolean) => {
         const updated = cartItems.map(item =>
             item.id === id ? {...item, selected: isChecked} : item
         );
         setCartItems(updated);
     };
 
-    const handleQuantityChange = async (id: number, action: "increase" | "decrease") => {
+    const handleQuantityChange = async (id: string, action: "increase" | "decrease") => {
         let updatedItems = [...cartItems];
         const itemToUpdate = updatedItems.find(item => item.id === id);
 
@@ -47,8 +49,10 @@ const Cart = () => {
 
             if (action === "increase") {
                 newQuantity += 1;
+                await fetchCart();
             } else if (action === "decrease" && newQuantity > 1) {
                 newQuantity -= 1;
+                await fetchCart();
             }
 
             itemToUpdate.quantity = newQuantity;
@@ -66,7 +70,7 @@ const Cart = () => {
     };
 
 
-    const removeItem = async (id: number) => {
+    const removeItem = async (id: string) => {
         await fetchDeleteCartItem(id);
 
         const updated = cartItems.filter(item => item.id !== id);
