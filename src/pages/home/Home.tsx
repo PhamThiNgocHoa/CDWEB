@@ -39,45 +39,18 @@ const navItems = [
 
 const Home = () => {
     const navigate = useNavigate();
-    const {fetchGetListCategory, categories, setCategories} = useCategory();
+    const {categories, setCategories} = useCategory();
 
     const handleProductClick = (id: string) => {
         navigate(`/productDetail/${id}`);
     };
     const {
-        fetchGetListProduct,
         products,
-        setProducts,
-        fetchGetListProductSale,
         saleProducts,
         setSaleProducts
     } = useProduct();
 
     const [showAllProducts, setShowAllProducts] = useState(false);  // state mới để kiểm soát số lượng sản phẩm hiển thị
-
-    useEffect(() => {
-        const getListCategory = async () => {
-            const categoryList = await fetchGetListCategory();
-            setCategories(categoryList); // Cập nhật lại state với danh sách category
-        }
-        getListCategory();
-    }, []);
-
-    useEffect(() => {
-        const getListProduct = async () => {
-            const productList = await fetchGetListProduct();
-            setProducts(productList);
-        }
-        getListProduct();
-    }, []);
-
-    useEffect(() => {
-        const getListProductSale = async () => {
-            const productList = await fetchGetListProductSale();
-            setSaleProducts(productList);
-        }
-        getListProductSale();
-    }, []);
 
     const toggleShowAllProducts = () => {
         setShowAllProducts(!showAllProducts);  // Thay đổi trạng thái khi nhấn nút "Xem thêm"

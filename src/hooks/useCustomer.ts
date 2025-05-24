@@ -92,7 +92,7 @@ function useCustomer() {
         }
     };
 
-    const fetchResetPassword = async (username: string, resetCode: string, newPassword: string) => {
+    const fetchResetPassword = async (username: string | undefined, resetCode: string, newPassword: string) => {
         setLoading(true);
         try {
             return await resetPassword(username, resetCode, newPassword);
@@ -114,7 +114,14 @@ function useCustomer() {
         }
     };
 
-    const fetchUpdateCustomer = async (customerId: number, customer: Customer) => {
+    const fetchUpdateCustomer = async (customerId: string | undefined, customer: {
+        password: string;
+        phone: string;
+        id: string | undefined;
+        fullname: string;
+        email: string;
+        username: string
+    }) => {
         setLoading(true);
         try {
             return await updateCustomer(customerId, customer);

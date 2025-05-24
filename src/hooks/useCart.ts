@@ -1,9 +1,9 @@
 // src/hooks/useCart.ts
-import { useState, useEffect } from "react";
-import { CartResponse } from "../models/response/CartResponse";
-import { getCartByCustomerId, getCartQuantityByCartId } from "../server/api/cart/cart.get";
+import {useState, useEffect} from "react";
+import {CartResponse} from "../models/response/CartResponse";
+import {getCartByCustomerId, getCartQuantityByCartId} from "../server/api/cart/cart.get";
 
-export const useCart = (customerId: number | null) => {
+export const useCart = (customerId: string | null) => {
     const [cartData, setCartData] = useState<CartResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

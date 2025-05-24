@@ -1,8 +1,8 @@
 import {ProductResponse} from "./ProductResponse";
 
 export interface OrderDetailResponse {
-    id: number;
-    orderId: number;
+    id: string;
+    orderId: string;
     productResponseDTO: ProductResponse;
     quantity: number;
 }

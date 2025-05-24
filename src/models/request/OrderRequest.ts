@@ -4,7 +4,7 @@ import {OrderDetailRequest} from "./OrderDetailRequest";
 
 
 export interface OrderRequest {
-    customerId: number;
+    customerId: string;
     totalAmount: number;
     address: string;
     numberPhone: string;

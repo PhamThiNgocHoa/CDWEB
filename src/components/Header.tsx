@@ -5,7 +5,8 @@ import IconTextItem from "./IconTextItem";
 import {useAuth} from "../hooks/useAuth";
 import {Link, useNavigate} from "react-router-dom";
 import useProduct from "../hooks/useProduct"; // Import hook để fetch sản phẩm
-import {Product} from "../models/Product"; // Import kiểu Product
+import {Product} from "../models/Product";
+import Notification from "./Notification"; // Import kiểu Product
 
 function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,21 @@ function Header() {
     const {isLoggedIn, handleLogout, setIsLoggedIn} = useAuth();
     const {fetchListFindByName} = useProduct();
     const navigate = useNavigate();
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState("");
+    const [notificationType, setNotificationType] = useState<"success" | "error">("success");
+
+
+
+    const showErrNotification = (message: string) => {
+        setNotificationMessage(message);
+        setNotificationType("error");
+        setShowNotification(true);
+
+        setTimeout(() => {
+            setShowNotification(false);
+        }, 3000);
+    }
 
     useEffect(() => {
         const token = localStorage.getItem("authToken");
@@ -146,6 +162,13 @@ function Header() {
                     </div>
                 </div>
             </div>
+            {showNotification && (
+                <Notification
+                    message={notificationMessage}
+                    type={notificationType}
+                    onClose={() => setShowNotification(false)}
+                />
+            )}
         </header>
     );
 }

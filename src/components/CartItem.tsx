@@ -4,7 +4,7 @@ import {faTrashCan} from "@fortawesome/free-solid-svg-icons";
 import formatToVND from "../hooks/formatToVND";
 
 interface CartItemType {
-    id: number;
+    id: string;
     name: string;
     price: number;
     quantity: number;
@@ -15,9 +15,9 @@ interface CartItemType {
 
 interface CartItemProps {
     item: CartItemType;
-    onQuantityChange: (id: number, action: "increase" | "decrease") => void;
-    onRemove: (id: number) => void;
-    onSelect: (id: number, isChecked: boolean) => void;
+    onQuantityChange: (id: string, action: "increase" | "decrease") => void;
+    onRemove: (id: string) => void;
+    onSelect: (id: string, isChecked: boolean) => void;
 }
 
 const CartItem: React.FC<CartItemProps> = ({item, onQuantityChange, onRemove, onSelect}) => {

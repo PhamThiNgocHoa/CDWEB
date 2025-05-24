@@ -1,5 +1,5 @@
 export interface OrderDetailSaveRequest {
-    productId: number;
-    orderId: number;
+    productId: string;
+    orderId: string;
     quantity: number;
 }

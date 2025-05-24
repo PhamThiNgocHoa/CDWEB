@@ -5,7 +5,7 @@ export const initPasswordReset = async (username: string): Promise<void> => {
 };
 
 export const resetPassword = async (
-    username: string,
+    username: string | undefined,
     resetCode: string,
     newPassword: string
 ): Promise<void> => {

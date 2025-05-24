@@ -1,3 +1,3 @@
 export interface CartRequest{
-    customerId: number
+    customerId: string
 }

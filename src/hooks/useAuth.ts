@@ -1,6 +1,6 @@
-import {checkTokenExpiration, logout} from "../server/api/authentication/auth.post"; // Import API logout
+import {checkTokenExpiration, logout} from "../server/api/authentication/auth.post";
 import {useEffect, useState} from "react";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 export const useAuth = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -9,29 +9,41 @@ export const useAuth = () => {
     const handleLogout = async () => {
         try {
             await logout();
-            setIsLoggedIn(false);
-            navigate("/login");
         } catch (error) {
             console.error("Logout failed:", error);
+        } finally {
+            localStorage.removeItem("authToken");
+            setIsLoggedIn(false);
+            navigate("/login");
         }
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-
         const verifyToken = async () => {
-            if (token) {
-                const isValid = await checkTokenExpiration(token);
-                if (!isValid) {
+            const token = localStorage.getItem("authToken");
+
+            if (!token) {
+                setIsLoggedIn(false);
+                return;
+            }
+
+            try {
+                const isExpired = await checkTokenExpiration(token);
+                if (isExpired) {
                     alert("Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.");
-                    localStorage.removeItem("token");
-                    window.location.href = "/login";
+                    handleLogout();
+                } else {
+                    setIsLoggedIn(true);
                 }
+            } catch (error) {
+                console.error("Token verification failed:", error);
+                handleLogout();
             }
         };
 
         verifyToken();
     }, []);
 
-    return { isLoggedIn, handleLogout, setIsLoggedIn };
+
+    return {isLoggedIn, handleLogout, setIsLoggedIn};
 };

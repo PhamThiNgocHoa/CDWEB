@@ -2,11 +2,7 @@ import React, { useEffect } from "react";
 import useCategory from "../../hooks/useCategory";
 
 const CategoryList = () => {
-    const { categories, error, fetchGetListCategory } = useCategory();
-
-    useEffect(() => {
-        fetchGetListCategory();
-    }, [fetchGetListCategory]);
+    const { categories, error } = useCategory();
 
     if (error) {
         return <div style={{ color: "red" }}>{error}</div>;

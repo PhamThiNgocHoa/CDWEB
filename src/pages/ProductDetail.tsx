@@ -3,13 +3,14 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import React, {useEffect, useState} from "react";
 import formatToVND from "../hooks/formatToVND";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {getProductById} from "../server/api/product/product.get";
 import {Product} from "../models/Product";
 import useCartItem from "../hooks/useCartItem";
 import {CartItemRequest} from "../models/request/CartItemRequest";
 import {getUser} from "../server/api/customers/customer.get";
-import Notification from "../components/Notification"; // Đảm bảo bạn import component Notification
+import Notification from "../components/Notification";
+import useProduct from "../hooks/useProduct";
 
 const ProductDetail = () => {
     type Ratings = {
@@ -31,7 +32,7 @@ const ProductDetail = () => {
         {stars: 3, content: "Sản phẩm trung bình, không như mong đợi."},
     ]);
 
-    const [reviewText, setReviewText] = useState(""); // Lưu mô tả đánh giá
+    const [reviewText, setReviewText] = useState("");
     const {id} = useParams<{ id: string }>();
     const [product, setProduct] = useState<Product>();
     const [loading, setLoading] = useState(true);
@@ -39,18 +40,28 @@ const ProductDetail = () => {
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState("");
     const [notificationType, setNotificationType] = useState<"success" | "error">("success");
+    const navigate = useNavigate()
 
-    // Hàm hiển thị thông báo
+
     const showSuccessNotification = (message: string) => {
         setNotificationMessage(message);
         setNotificationType("success");
         setShowNotification(true);
 
-        // Đặt thời gian đóng tự động sau 3 giây
         setTimeout(() => {
             setShowNotification(false);
         }, 3000);
     };
+
+    const showErrNotification = (message: string) => {
+        setNotificationMessage(message);
+        setNotificationType("error");
+        setShowNotification(true);
+
+        setTimeout(() => {
+            setShowNotification(false);
+        }, 3000);
+    }
 
     const handleReviewSubmit = () => {
         if (reviewText.trim() === "") {
@@ -77,11 +88,17 @@ const ProductDetail = () => {
     }, [id]);
 
     const handleAddToCart = async () => {
+        const token = localStorage.getItem('authToken');
+
+        if (!token) {
+            showErrNotification("Vui lòng đăng nhập!");
+            return;
+        }
         if (!product) return;
 
         try {
             const user = await getUser();
-            if (!user?.cartId) {
+            if (!user.cartId) {
                 return;
             }
 
@@ -93,6 +110,7 @@ const ProductDetail = () => {
 
             await fetchSaveCartItem(cartItem);
             showSuccessNotification("Sản phẩm đã được thêm vào giỏ hàng!");
+            localStorage.setItem("cartUpdated", new Date().toISOString());
         } catch (error) {
             console.error(error);
         }

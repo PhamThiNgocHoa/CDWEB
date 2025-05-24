@@ -28,7 +28,7 @@ export const register = async (
 
 export const login = async (username: string, password: string): Promise<any> => {
     try {
-        const response = await ApiService.post("/api/auth/login", { username, password }, {}, false);
+        const response = await ApiService.post("/api/auth/login", {username, password}, {}, false);
 
         const token = response.data.token;
         const user = response.data.user;
@@ -43,7 +43,7 @@ export const login = async (username: string, password: string): Promise<any> =>
             localStorage.setItem("user", JSON.stringify(user)); // lưu toàn bộ nếu cần
         }
 
-        return { success: true };
+        return {success: true};
     } catch (error: any) {
         console.error("Error:", error.message);
         throw new Error("Login failed");
@@ -61,15 +61,16 @@ export const authenticate = async (
 ): Promise<IntrospectResponse> => {
     return await ApiService.post("/api/auth/introspect", request);
 };
-export const checkTokenExpiration = async (token: string): Promise<boolean> => {
+export const checkTokenExpiration = async (token: string | null): Promise<boolean> => {
     try {
         const response = await ApiService.post(`/api/auth/checkTokenExpiration/${token}`, {}, {}, false);
-        return response.data as boolean;
+        return response.message === "true";
     } catch (error: any) {
         console.error("checkTokenExpiration failed", error);
-        return false; // hoặc tùy logic của bạn
+        return false;
     }
 };
+
 
 
 
