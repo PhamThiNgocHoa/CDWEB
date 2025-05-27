@@ -15,6 +15,7 @@ import OrderDetail from "../pages/OrderDetail";
 import ForgotPassword from "../pages/FogotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import TestProductPage from "../pages/TestProductPage";
+import Account from "../pages/account/Account";
 
 const Router = () => {
     return (
@@ -32,10 +33,10 @@ const Router = () => {
             <Route path="/searchProduct/:name" element={<SearchProduct/>}/>
             <Route path="/checkout" element={<Checkout/>}/>
             <Route path="/orderHistory/:userId" element={<OrderHistory/>}/>
-            <Route path="/orderDetail/:userId" element={<OrderDetail/>}/>
+            <Route path="/orderDetail/:orderId" element={<OrderDetail/>}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/reset-password/:username" element={<ResetPassword/>}/>
-            <Route path="/v" element={<TestProductPage/>}/>
+            <Route path="/account" element={<Account/>}/>
 
 
         </Routes>

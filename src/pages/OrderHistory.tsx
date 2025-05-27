@@ -54,7 +54,6 @@ function OrderHistory() {
 
     return (
         <>
-            <Header/>
             <div className="bg-gray-100 py-8">
                 <div className="flex flex-col md:flex-row p-4 gap-4">
                     {/* Sidebar */}
@@ -140,7 +139,6 @@ function OrderHistory() {
                     </div>
                 </div>
             </div>
-            <Footer/>
         </>
     );
 }
