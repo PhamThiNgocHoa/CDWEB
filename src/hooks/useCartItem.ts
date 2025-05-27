@@ -4,7 +4,6 @@ import {updateCartItem, updateQuantityCartItem} from "../server/api/cartItem/car
 import {deleteCartItem} from "../server/api/cartItem/cartItem.delete";
 import {useState} from "react";
 import {CartItemResponse} from "../models/response/CartItemResponse";
-import Product from "../pages/Product";
 import {ProductResponse} from "../models/response/ProductResponse";
 
 // Hàm sử dụng trong custom hook để quản lý giỏ hàng

@@ -1,3 +1,6 @@
+import {BookForm} from "../../enums/BookForm";
+import {Category} from "../Category";
+
 export interface ProductResponse {
     id: string;
     name: string;
@@ -12,8 +15,8 @@ export interface ProductResponse {
     weight?: number;
     size?: string;
     pageNumber?: number;
-    form?: string;
-    categoryId?: number;
+    form?: BookForm;
+    categoryId?: string;
     categoryName?: string;
     discount?: number;
 

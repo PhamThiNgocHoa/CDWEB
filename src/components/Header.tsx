@@ -1,25 +1,26 @@
-import React, {useState, useEffect} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHeart, faReceipt, faSignOut, faUser, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart, faReceipt, faSignOut, faUser, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import IconTextItem from "./IconTextItem";
-import {useAuth} from "../hooks/useAuth";
-import {Link, useNavigate} from "react-router-dom";
-import useProduct from "../hooks/useProduct"; // Import hook để fetch sản phẩm
-import {Product} from "../models/Product";
-import Notification from "./Notification"; // Import kiểu Product
+import { useAuth } from "../hooks/useAuth";
+import { Link, useNavigate } from "react-router-dom";
+import useProduct from "../hooks/useProduct"; // Hook fetch sản phẩm
+import { ProductResponse } from "../models/response/ProductResponse"; // Kiểu dữ liệu sản phẩm
+import Notification from "./Notification";
 
 function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [suggestions, setSuggestions] = useState<Product[]>([]);
-    const {isLoggedIn, handleLogout, setIsLoggedIn} = useAuth();
-    const {fetchListFindByName} = useProduct();
+    const [suggestions, setSuggestions] = useState<ProductResponse[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const { isLoggedIn, handleLogout, setIsLoggedIn } = useAuth();
+    const { fetchListFindByName } = useProduct();
     const navigate = useNavigate();
+
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState("");
     const [notificationType, setNotificationType] = useState<"success" | "error">("success");
-
-
 
     const showErrNotification = (message: string) => {
         setNotificationMessage(message);
@@ -29,7 +30,7 @@ function Header() {
         setTimeout(() => {
             setShowNotification(false);
         }, 3000);
-    }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem("authToken");
@@ -38,7 +39,7 @@ function Header() {
         } else {
             setIsLoggedIn(false);
         }
-    }, [isLoggedIn]);
+    }, [setIsLoggedIn]);
 
     const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
@@ -47,27 +48,34 @@ function Header() {
         if (query.length > 0) {
             const result = await fetchListFindByName(query);
             setSuggestions(result);
+            setShowSuggestions(true);
         } else {
             setSuggestions([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    const handClick = () => {
+        if (searchQuery.trim() !== "") {
+            navigate(`/searchProduct/${encodeURIComponent(searchQuery)}`);
+            setShowSuggestions(false);
         }
     };
 
     const toggleMenu = () => {
-        setIsMenuOpen(prev => !prev);
+        setIsMenuOpen((prev) => !prev);
     };
 
-    const handClick = async () => {
-        if (searchQuery !== " ") {
-            navigate(`/searchProduct/${encodeURIComponent(searchQuery)}`);
-        }
-    }
-
+    const handleCloseSuggestions = () => {
+        setShowSuggestions(false);
+    };
 
     return (
         <header>
             <div className="w-full h-full hidden xl:flex">
-                <img src="/image/image1.png"/>
+                <img src="/image/image1.png" alt="Banner" />
             </div>
+
             <div className="w-full py-4 px-4 md:px-10 lg:px-20 flex justify-between items-center">
                 {/* Logo */}
                 <div className="logo flex-shrink-0">
@@ -79,8 +87,7 @@ function Header() {
                 </div>
 
                 {/* Ô tìm kiếm */}
-                <div
-                    className="flex items-center flex-grow mx-4 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl border rounded-md h-12 relative">
+                <div className="flex items-center flex-grow mx-4 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl border rounded-md h-12 relative">
                     <input
                         type="text"
                         value={searchQuery}
@@ -88,15 +95,28 @@ function Header() {
                         placeholder="Tìm kiếm..."
                         className="w-full p-2 focus:outline-none text-sm sm:text-base"
                     />
-                    <button className="bg-red-500 text-white rounded-lg p-2 ml-2 hover:bg-red-300 focus:outline-none"
-                            onClick={handClick}>
+                    <button
+                        className="bg-red-500 text-white rounded-lg p-2 ml-2 hover:bg-red-300 focus:outline-none"
+                        onClick={handClick}
+                    >
                         <i className="fas fa-search"></i>
                     </button>
+                    {/* Nút đóng gợi ý */}
+                    {showSuggestions && (
+                        <button
+                            onClick={handleCloseSuggestions}
+                            className="absolute top-10 bottom-10 right-2 z-[9999] text-gray-600 hover:text-gray-900 focus:outline-none"
+                            aria-label="Đóng gợi ý"
+                        >
+                            ✕
+                        </button>
+                    )}
+
+
                     {/* Hiển thị gợi ý tìm kiếm */}
-                    {suggestions.length > 0 && (
-                        <div
-                            className="absolute top-14 left-0 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
-                            {suggestions.map((product: Product) => (
+                    {showSuggestions && suggestions.length > 0 && (
+                        <div className="absolute top-14 left-0 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
+                            {suggestions.map((product: ProductResponse) => (
                                 <div key={product.id} className="p-2 hover:bg-gray-200 cursor-pointer">
                                     <Link to={`/productDetail/${product.id}`} className="flex items-center">
                                         <img
@@ -117,38 +137,42 @@ function Header() {
                     {/* Giỏ hàng */}
                     <Link to="/cart">
                         <div className="flex flex-col items-center justify-center cursor-pointer px-2 group">
-                            <FontAwesomeIcon className="text-gray-500 group-hover:text-red-500" icon={faShoppingCart}/>
+                            <FontAwesomeIcon
+                                className="text-gray-500 group-hover:text-red-500"
+                                icon={faShoppingCart}
+                            />
                             <p className="text-xs hidden lg:flex group-hover:text-red-500">Giỏ hàng</p>
                         </div>
                     </Link>
 
                     {/* Tài khoản */}
-                    <div className="relative flex flex-col items-center cursor-pointer hover:text-red-500 px-4"
-                         onClick={toggleMenu}>
+                    <div
+                        className="relative flex flex-col items-center cursor-pointer hover:text-red-500 px-4"
+                        onClick={toggleMenu}
+                    >
                         <div className="flex flex-col items-center justify-center cursor-pointer px-2 group">
-                            <FontAwesomeIcon className="text-gray-500 group-hover:text-red-500" icon={faUser}/>
+                            <FontAwesomeIcon className="text-gray-500 group-hover:text-red-500" icon={faUser} />
                             <p className="text-xs hidden lg:flex group-hover:text-red-500">Tài khoản</p>
                         </div>
                         {isMenuOpen && (
-                            <div
-                                className="absolute z-50 text-sm text-gray-400 bg-white border rounded-md shadow-lg mt-10 py-2 w-72">
-                                {/* Hiển thị nội dung khi đã đăng nhập */}
+                            <div className="absolute z-50 text-sm text-gray-400 bg-white border rounded-md shadow-lg mt-10 py-2 w-72">
+                                {/* Nội dung menu khi đã đăng nhập */}
                                 {isLoggedIn ? (
                                     <>
-                                        <IconTextItem icon={faUser} text="Thành viên Book Store"/>
-                                        <IconTextItem icon={faReceipt} text="Đơn hàng của tôi"/>
-                                        <IconTextItem icon={faHeart} text="Thành viên Book Store"/>
+                                        <IconTextItem icon={faUser} text="Thành viên Book Store" />
+                                        <IconTextItem icon={faReceipt} text="Đơn hàng của tôi" />
+                                        <IconTextItem icon={faHeart} text="Thành viên Book Store" />
                                         <div onClick={handleLogout}>
-                                            <IconTextItem icon={faSignOut} text="Thoát"/>
+                                            <IconTextItem icon={faSignOut} text="Thoát" />
                                         </div>
                                     </>
                                 ) : (
                                     <>
                                         <a href="/login">
-                                            <IconTextItem icon={faUser} text="Đăng nhập"/>
+                                            <IconTextItem icon={faUser} text="Đăng nhập" />
                                         </a>
                                         <a href="/register">
-                                            <IconTextItem icon={faSignOut} text="Đăng ký"/>
+                                            <IconTextItem icon={faSignOut} text="Đăng ký" />
                                         </a>
                                     </>
                                 )}
@@ -156,12 +180,17 @@ function Header() {
                         )}
                     </div>
 
+                    {/* Cờ Việt Nam */}
                     <div className="flex items-center border border-gray-600 rounded-md px-2 flex-shrink-0">
-                        <img className="w-8 h-6 object-cover flex-shrink-0"
-                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Vietnam.svg/800px-Flag_of_Vietnam.svg.png"/>
+                        <img
+                            className="w-8 h-6 object-cover flex-shrink-0"
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Vietnam.svg/800px-Flag_of_Vietnam.svg.png"
+                            alt="Vietnam Flag"
+                        />
                     </div>
                 </div>
             </div>
+
             {showNotification && (
                 <Notification
                     message={notificationMessage}

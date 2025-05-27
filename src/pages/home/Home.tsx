@@ -11,7 +11,8 @@ import CardProduct from "../../components/CardProduct";
 import useCategory from "../../hooks/useCategory";
 import ListCategory from "../../components/ListCategory";
 import {Product} from "../../models/Product";
-import useProduct from "../../hooks/useProduct"; // Import component Error popup
+import useProduct from "../../hooks/useProduct";
+import {ProductResponse} from "../../models/response/ProductResponse"; // Import component Error popup
 
 const mainImages = [
     '../image/TrangUuDaiT525_840x320.webp',
@@ -69,7 +70,7 @@ const Home = () => {
                     <div className="mt-4 sm:px-10 md:px-10 lg:px-22 xl:px-36">
                         <div className="flex overflow-x-auto whitespace-nowrap gap-5">
                             <div className="flex flex-row w-full gap-5 mb-4">
-                                {saleProducts.map((product: Product) => (
+                                {saleProducts.map((product: ProductResponse) => (
                                     <CardProduct
                                         key={product.id}
                                         id={product.id}
@@ -99,7 +100,7 @@ const Home = () => {
                         </div>
                         <div
                             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 py-4 px-4">
-                            {showAllProducts ? products.map((product: Product) => (
+                            {showAllProducts ? products.map((product: ProductResponse) => (
                                 <CardProduct
                                     key={product.id}
                                     id={product.id}
@@ -112,7 +113,7 @@ const Home = () => {
 
 
                                 />
-                            )) : products.slice(0, 8).map((product: Product) => (
+                            )) : products.slice(0, 8).map((product: ProductResponse) => (
                                 <CardProduct
                                     key={product.id}
                                     id={product.id}
