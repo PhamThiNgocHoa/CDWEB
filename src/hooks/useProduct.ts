@@ -1,19 +1,30 @@
-import {useEffect, useState} from "react";
-import {Product} from "../models/Product";
+import { useCallback, useEffect, useState } from "react";
+import { Product } from "../models/Product";
 import {
+    filterProduct,
     getListProduct,
     getProductById,
     getProductSale,
     listFindByName,
     searchProduct
 } from "../server/api/product/product.get";
+import { BookForm } from "../enums/BookForm";
+import { ProductResponse } from "../models/response/ProductResponse";
+
+type FilterParams = {
+    name?: string;
+    categoryId?: string;
+    bookForm?: BookForm;
+    minPrice?: number;
+    maxPrice?: number;
+};
 
 function useProduct() {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<ProductResponse[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [saleProducts, setSaleProducts] = useState<Product[]>([]);
-
+    const [saleProducts, setSaleProducts] = useState<ProductResponse[]>([]);
+    const [params, setParams] = useState<FilterParams>({});
 
     const handleError = (error: unknown) => {
         const message = error instanceof Error ? error.message : "Unknown error occurred";
@@ -21,24 +32,61 @@ function useProduct() {
         throw new Error(message);
     };
 
+    // Chỉ gọi 1 lần khi load để lấy tất cả sản phẩm nếu không có filter
+    useEffect(() => {
+        const fetchAllProducts = async () => {
+            try {
+                const data = await getListProduct();
+                setProducts(data);
+            } catch (error) {
+                handleError(error);
+            }
+        };
+        fetchAllProducts();
+    }, []);
+
+    // Gọi API lấy sản phẩm khuyến mãi khi load
+    useEffect(() => {
+        const fetchSaleProducts = async () => {
+            try {
+                const data = await getProductSale();
+                setSaleProducts(data);
+            } catch (error) {
+                handleError(error);
+            }
+        };
+        fetchSaleProducts();
+    }, []);
+
+    // Lọc sản phẩm theo params
+    const fetchProducts = useCallback(async () => {
+        const hasFilter = Object.keys(params).length > 0;
+        if (!hasFilter) return; // Không gọi nếu không có bộ lọc
+
+        setLoading(true);
+        setError(null);
+        try {
+            const result = await filterProduct(
+                params.name,
+                params.categoryId,
+                params.bookForm,
+                params.minPrice,
+                params.maxPrice
+            );
+            console.log("API trả về sản phẩm:", result);
+            setProducts(result);
+        } catch (err: any) {
+            setError(err.message || "Đã có lỗi xảy ra");
+        } finally {
+            setLoading(false);
+        }
+    }, [params]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const data = await getListProduct()
-            setProducts(data);
-        }
-        fetchData();
-    }, [getListProduct]);
+        fetchProducts();
+    }, [fetchProducts]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getProductSale()
-            setSaleProducts(data);
-        }
-        fetchData();
-    }, [getProductSale]);
-
-    const fetchGetProductById = async (id: string): Promise<Product | null> => {
+    const fetchGetProductById = async (id: string): Promise<ProductResponse | null> => {
         setLoading(true);
         try {
             return await getProductById(id);
@@ -50,8 +98,7 @@ function useProduct() {
         }
     };
 
-
-    const fetchSearchProductByName = async (name: string): Promise<Product[]> => {
+    const fetchSearchProductByName = async (name: string): Promise<ProductResponse[]> => {
         setLoading(true);
         try {
             return await searchProduct(name);
@@ -61,9 +108,9 @@ function useProduct() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
-    const fetchListFindByName = async (name: string): Promise<Product[]> => {
+    const fetchListFindByName = async (name: string): Promise<ProductResponse[]> => {
         setLoading(true);
         try {
             return await listFindByName(name);
@@ -73,7 +120,7 @@ function useProduct() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return {
         products,
@@ -81,9 +128,12 @@ function useProduct() {
         loading,
         fetchGetProductById,
         setProducts,
-        saleProducts, setSaleProducts,
+        saleProducts,
+        setSaleProducts,
         fetchSearchProductByName,
         fetchListFindByName,
+        params,
+        setParams,
     };
 }
 

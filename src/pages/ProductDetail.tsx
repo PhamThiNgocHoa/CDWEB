@@ -11,6 +11,7 @@ import {CartItemRequest} from "../models/request/CartItemRequest";
 import {getUser} from "../server/api/customers/customer.get";
 import Notification from "../components/Notification";
 import useProduct from "../hooks/useProduct";
+import {ProductResponse} from "../models/response/ProductResponse";
 
 const ProductDetail = () => {
     type Ratings = {
@@ -34,7 +35,7 @@ const ProductDetail = () => {
 
     const [reviewText, setReviewText] = useState("");
     const {id} = useParams<{ id: string }>();
-    const [product, setProduct] = useState<Product>();
+    const [product, setProduct] = useState<ProductResponse>();
     const [loading, setLoading] = useState(true);
     const {fetchSaveCartItem} = useCartItem();
     const [showNotification, setShowNotification] = useState(false);

@@ -20,12 +20,13 @@ class ApiService {
         method: string = "GET",
         body: any = null,
         headers: any = {},
-        requireAuth: boolean = true
+        requireAuth: boolean = true,
+        params: any = null
     ): Promise<any> {
         try {
             const combinedHeaders = requireAuth
-                ? { ...ApiService.getAuthHeaders(), ...headers }
-                : { "Content-Type": "application/json", ...headers };
+                ? {...ApiService.getAuthHeaders(), ...headers}
+                : {"Content-Type": "application/json", ...headers};
 
             const axiosConfig: any = {
                 url,
@@ -33,6 +34,10 @@ class ApiService {
                 headers: combinedHeaders,
                 data: body,
             };
+
+            if (params) {
+                axiosConfig.params = params;
+            }
 
             const response = await axios(axiosConfig);
 
@@ -45,8 +50,9 @@ class ApiService {
         }
     }
 
-    public static get(url: string, headers: any = {}, requireAuth: boolean = true): Promise<any> {
-        return ApiService.request(url, "GET", null, headers, requireAuth);
+
+    public static get(url: string, params: any = {}, headers: any = {}, requireAuth: boolean = true): Promise<any> {
+        return ApiService.request(url, "GET", null, headers, requireAuth, params);
     }
 
     public static post(url: string, body: any, headers: any = {}, requireAuth: boolean = true): Promise<any> {
