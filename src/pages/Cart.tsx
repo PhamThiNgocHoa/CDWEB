@@ -7,11 +7,12 @@ import useCart from "../hooks/useCart";
 import {getCurrentUserId} from "../utils/authUtils";
 import useCartItem from "../hooks/useCartItem";
 import {CartItemRequest} from "../models/request/CartItemRequest";
+import {Link} from "react-router-dom";
 
 const Cart = () => {
 
     const tokenData = getCurrentUserId();
-    const customerId = tokenData || null;
+    const customerId = tokenData || undefined;
     const {fetchCart} = useCart(customerId);
 
     const {cartData, loading, error} = useCart(customerId);
@@ -32,13 +33,6 @@ const Cart = () => {
             setCartItems(itemsWithSelect);
         }
     }, [cartData]);
-
-    const handleSelect = (id: string, isChecked: boolean) => {
-        const updated = cartItems.map(item =>
-            item.id === id ? {...item, selected: isChecked} : item
-        );
-        setCartItems(updated);
-    };
 
     const handleQuantityChange = async (id: string, action: "increase" | "decrease") => {
         let updatedItems = [...cartItems];
@@ -79,9 +73,10 @@ const Cart = () => {
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            return item.selected ? total + item.price * item.quantity : total;
+            return total + item.price * item.quantity;
         }, 0);
     };
+
 
     if (loading) {
         return (
@@ -120,26 +115,13 @@ const Cart = () => {
                                         item={item}
                                         onQuantityChange={handleQuantityChange}
                                         onRemove={removeItem}
-                                        onSelect={handleSelect}
                                     />
                                 ))
                             )}
                         </div>
                     </div>
 
-                    <div className="space-y-8 sm:mt-6 max-w-md w-full mt-4 mx-auto">
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h3 className="text-md mb-4 border-b pb-2 font-semibold">Mã giảm giá</h3>
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Nhập mã giảm giá"
-                                    className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                <button className="px-4 py-2 bg-blue-500 text-white rounded-md">ÁP MÃ</button>
-                            </div>
-                        </div>
-
+                    <div className="space-y-8 sm:mt-6 max-w-md w-full mt-4 mx-auto py-10">
                         <div className="bg-white p-4 rounded-lg shadow-md">
                             <h3 className="text-md mb-4 border-b pb-2 font-semibold">Thành Tiền</h3>
                             <div className="flex justify-between mb-4">
@@ -148,7 +130,14 @@ const Cart = () => {
                                     {formatToVND(calculateTotal())}
                                 </span>
                             </div>
-                            <button className="w-full py-3 bg-red-500 text-white rounded-md">THANH TOÁN</button>
+                            <Link to="/checkout">
+                                <button
+                                    className="w-full py-3 bg-red-500 text-white rounded-md"
+                                >
+                                    THANH TOÁN
+                                </button>
+                            </Link>
+
                         </div>
                     </div>
                 </div>

@@ -61,15 +61,33 @@ export const authenticate = async (
 ): Promise<IntrospectResponse> => {
     return await ApiService.post("/api/auth/introspect", request);
 };
-export const checkTokenExpiration = async (token: string | null): Promise<boolean> => {
+
+export const checkTokenExpiration = async (token: string | null): Promise<number> => {
+    if (!token) {
+        return 401;
+    }
     try {
         const response = await ApiService.post(`/api/auth/checkTokenExpiration/${token}`, {}, {}, false);
-        return response.message === "true";
+        return response.code;
     } catch (error: any) {
         console.error("checkTokenExpiration failed", error);
-        return false;
+        return 500;
     }
 };
+
+
+export const checkUsername = async (username: string): Promise<boolean> => {
+    const res = await ApiService.post("/api/auth/check-username", username, {"Content-Type": "text/plain"}, false);
+    return res.data === true;
+};
+
+export const checkEmail = async (email: string): Promise<boolean> => {
+    const res = await ApiService.post("/api/auth/check-email", email, {"Content-Type": "text/plain"}, false);
+    return res.data === true;
+};
+
+
+
 
 
 

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { Product } from "../models/Product";
+import {useCallback, useEffect, useState} from "react";
+import {Product} from "../models/Product";
 import {
     filterProduct,
     getListProduct,
@@ -8,8 +8,8 @@ import {
     listFindByName,
     searchProduct
 } from "../server/api/product/product.get";
-import { BookForm } from "../enums/BookForm";
-import { ProductResponse } from "../models/response/ProductResponse";
+import {BookForm} from "../enums/BookForm";
+import {ProductResponse} from "../models/response/ProductResponse";
 
 type FilterParams = {
     name?: string;
@@ -57,34 +57,6 @@ function useProduct() {
         };
         fetchSaleProducts();
     }, []);
-
-    // Lọc sản phẩm theo params
-    const fetchProducts = useCallback(async () => {
-        const hasFilter = Object.keys(params).length > 0;
-        if (!hasFilter) return; // Không gọi nếu không có bộ lọc
-
-        setLoading(true);
-        setError(null);
-        try {
-            const result = await filterProduct(
-                params.name,
-                params.categoryId,
-                params.bookForm,
-                params.minPrice,
-                params.maxPrice
-            );
-            console.log("API trả về sản phẩm:", result);
-            setProducts(result);
-        } catch (err: any) {
-            setError(err.message || "Đã có lỗi xảy ra");
-        } finally {
-            setLoading(false);
-        }
-    }, [params]);
-
-    useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
 
     const fetchGetProductById = async (id: string): Promise<ProductResponse | null> => {
         setLoading(true);

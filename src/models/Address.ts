@@ -1,9 +1,9 @@
 export interface Address {
-    id: number;
+    id: string;
     address: string;
     numberPhone: string;
     receiver: string;
-    note?: string;
-    customerId: number;
+    note: string;
+    customerId: string;
     isDefault: boolean;
 }

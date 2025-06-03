@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Sidebar from "./component/Sidebar";
 import AccountInfo from "./component/AccountInfo";
 import UpdateAccountPopup from "./component/UpdateAccountPopup";
@@ -29,15 +29,13 @@ const Account = () => {
 
     return (
         <>
-            <Header />
+            <Header/>
             <div className="flex min-h-screen bg-gray-100">
-                <Sidebar onSelectSection={setActiveSection} />
+                <Sidebar onSelectSection={setActiveSection}/>
                 <main className="flex-1 p-10">
-                    {/* Hiển thị popup nếu cần */}
-                    {showUpdatePopup && <UpdateAccountPopup onClose={handleClosePopup} />}
-                    {showPasswordPopup && <ChangePasswordPopup onClose={handleClosePopup} />}
+                    {showUpdatePopup && <UpdateAccountPopup onClose={handleClosePopup}/>}
+                    {showPasswordPopup && <ChangePasswordPopup onClose={handleClosePopup}/>}
 
-                    {/* Hiển thị nội dung tương ứng */}
                     {!showUpdatePopup && !showPasswordPopup && (
                         <>
                             {activeSection === "info" && (
@@ -46,7 +44,7 @@ const Account = () => {
                                     onChangePassword={handleOpenPasswordPopup}
                                 />
                             )}
-                            {activeSection === "orders" && <OrderHistory />}
+                            {activeSection === "orders" && <OrderHistory/>}
                             {activeSection === "favorites" && (
                                 <div>Sản phẩm yêu thích (chưa làm)</div>
                             )}
@@ -54,7 +52,7 @@ const Account = () => {
                     )}
                 </main>
             </div>
-            <Footer />
+            <Footer/>
         </>
     );
 };

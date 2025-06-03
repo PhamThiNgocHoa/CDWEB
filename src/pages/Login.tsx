@@ -1,13 +1,11 @@
 import React, {useEffect, useState} from "react";
-import useUsers from "../hooks/useCustomer";
 import {useNavigate} from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import {useAuth} from "../hooks/useAuth";
-import {checkTokenExpiration} from "../server/api/authentication/auth.post";
+import useCustomer from "../hooks/useCustomer";
 
 function Login() {
-    const {handleLogin} = useUsers();
+    const {handleLogin} = useCustomer();
     const [formData, setFormData] = useState({username: "", password: ""});
     const navigate = useNavigate();
 

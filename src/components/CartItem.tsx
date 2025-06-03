@@ -17,20 +17,11 @@ interface CartItemProps {
     item: CartItemType;
     onQuantityChange: (id: string, action: "increase" | "decrease") => void;
     onRemove: (id: string) => void;
-    onSelect: (id: string, isChecked: boolean) => void;
 }
 
-const CartItem: React.FC<CartItemProps> = ({item, onQuantityChange, onRemove, onSelect}) => {
+const CartItem: React.FC<CartItemProps> = ({item, onQuantityChange, onRemove}) => {
     return (
         <div className="flex items-center bg-white p-4 rounded-lg shadow-md mb-4">
-            <input
-                type="checkbox"
-                checked={item.selected}
-                onChange={(e) => onSelect(item.id, e.target.checked)}
-                style={{accentColor: "red"}}
-                className="w-6 h-6"
-                aria-label={`Chọn sản phẩm ${item.name}`}
-            />
             <img
                 src={item.image}
                 alt={item.name}

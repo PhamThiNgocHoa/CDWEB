@@ -2,7 +2,7 @@ import {ChangePasswordDto} from "../../../models/ChangePasswordDto";
 import ApiService from "../ApiService";
 
 export const changePassword = async (
-    customerId: number,
+    customerId: string,
     dto: ChangePasswordDto
 ): Promise<void> => {
 

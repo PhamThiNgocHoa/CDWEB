@@ -1,7 +1,7 @@
 // src/hooks/FormLogic.ts
-import { useState, useEffect } from "react";
-import { checkEmail, checkUsername } from "../server/api/customers/customer.get";
-import { register } from "../server/api/authentication/auth.post";
+import {useState, useEffect} from "react";
+import {checkEmail, checkUsername, register} from "../server/api/authentication/auth.post";
+import {exists} from "node:fs";
 
 export const useRegisterForm = () => {
     const [fullname, setFullname] = useState('');
@@ -14,11 +14,11 @@ export const useRegisterForm = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     const [isUsernameTaken, setIsUsernameTaken] = useState(false);
+    const [isEmailTaken, setIsEmailTaken] = useState(true);
     const [isEmailValid, setIsEmailValid] = useState(true);
     const [isPhoneValid, setIsPhoneValid] = useState(true);
     const [isPasswordValid, setIsPasswordValid] = useState(true);
 
-    // Kiểm tra tên người dùng đã tồn tại hay chưa
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             if (username.length >= 2) {
@@ -27,7 +27,6 @@ export const useRegisterForm = () => {
                         setIsUsernameTaken(exists);
                     })
                     .catch((err) => {
-                        console.error("Lỗi kiểm tra username:", err);
                         setIsUsernameTaken(false);
                     });
             } else {
@@ -38,20 +37,19 @@ export const useRegisterForm = () => {
         return () => clearTimeout(delayDebounce);
     }, [username]);
 
-    // Kiểm tra email đã tồn tại hay chưa
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-            if (email.length >= 5) {
+            if (email) {
                 checkEmail(email)
                     .then((exists: boolean) => {
-                        setIsEmailValid(!exists); // Nếu có email tồn tại thì set thành invalid
+                        setIsEmailTaken(exists);
                     })
                     .catch((err) => {
                         console.error("Lỗi kiểm tra email:", err);
-                        setIsEmailValid(true); // Nếu có lỗi, cho phép nhập
+                        setIsEmailTaken(false);
                     });
             } else {
-                setIsEmailValid(true);
+                setIsEmailTaken(false);
             }
         }, 500);
 
@@ -60,11 +58,15 @@ export const useRegisterForm = () => {
 
     // Hàm xử lý thay đổi của input
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
 
         if (name === "fullname") setFullname(value);
         if (name === "username") setUsername(value);
-        if (name === "email") setEmail(value);
+        if (name === "email") {
+            setEmail(value);
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            setIsEmailValid(emailRegex.test(value));
+        }
         if (name === "password") {
             setPassword(value);
             const passwordRegex = /^(?=.*[A-Z])(?=.*\W).{8,}$/;
@@ -77,7 +79,6 @@ export const useRegisterForm = () => {
         }
     };
 
-    // Hàm xử lý đăng ký
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -96,11 +97,19 @@ export const useRegisterForm = () => {
             return;
         }
 
-        if (!isEmailValid) {
-            setError("Email không hợp lệ.");
+        if (isEmailTaken) {
+            setError("Email đã tồn tại.");
             setLoading(false);
             return;
         }
+
+        if (isEmailValid)
+
+            if (!isEmailValid) {
+                setError("Email không hợp lệ.");
+                setLoading(false);
+                return;
+            }
 
         if (!isPhoneValid) {
             setError("Số điện thoại không hợp lệ.");
@@ -138,6 +147,7 @@ export const useRegisterForm = () => {
         isPhoneValid,
         isPasswordValid,
         handleChange,
-        handleRegister
+        handleRegister,
+        isEmailTaken,
     };
 };

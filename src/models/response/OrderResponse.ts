@@ -13,4 +13,5 @@ export interface OrderResponse {
     status: OrderStatus;
     receiver: string;
     orderDetails: OrderDetailResponse[];
+    discountCode: string;
 }
