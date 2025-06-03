@@ -7,13 +7,13 @@ import {useRegisterForm} from "../hooks/useRegisterForm";
 function Register() {
     const {
         fullname, username, email, password, phone,
-        error, message, loading, isUsernameTaken, isEmailValid,
+        error, message, loading, isUsernameTaken, isEmailValid, isEmailTaken,
         isPhoneValid, isPasswordValid, handleChange, handleRegister
     } = useRegisterForm();
 
     return (
         <div>
-            <Header />
+            <Header/>
             <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
                 <div className="flex justify-center items-center md:w-1/2 bg-blue-100 p-4">
                     <img
@@ -64,7 +64,8 @@ function Register() {
 
                             {/* Email */}
                             <div className="mb-4">
-                                <label htmlFor="email" className="block text-sm font-semibold text-gray-600">Email</label>
+                                <label htmlFor="email"
+                                       className="block text-sm font-semibold text-gray-600">Email</label>
                                 <input
                                     id="email"
                                     name="email"
@@ -74,14 +75,18 @@ function Register() {
                                     className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Nhập email của bạn"
                                 />
+                                {isEmailTaken && (
+                                    <div className="text-red-500 text-sm">Email đã tồn tại</div>
+                                )}
                                 {!isEmailValid && (
-                                    <div className="text-red-500 text-sm">Email không hợp lệ hoặc đã tồn tại</div>
+                                    <div className="text-red-500 text-sm">Email không hợp lệ</div>
                                 )}
                             </div>
 
                             {/* Số điện thoại */}
                             <div className="mb-4">
-                                <label htmlFor="phone" className="block text-sm font-semibold text-gray-600">Số điện thoại</label>
+                                <label htmlFor="phone" className="block text-sm font-semibold text-gray-600">Số điện
+                                    thoại</label>
                                 <input
                                     id="phone"
                                     name="phone"
@@ -98,7 +103,8 @@ function Register() {
 
                             {/* Mật khẩu */}
                             <div className="mb-4">
-                                <label htmlFor="password" className="block text-sm font-semibold text-gray-600">Mật khẩu</label>
+                                <label htmlFor="password" className="block text-sm font-semibold text-gray-600">Mật
+                                    khẩu</label>
                                 <input
                                     id="password"
                                     name="password"
@@ -109,7 +115,8 @@ function Register() {
                                     placeholder="Nhập mật khẩu"
                                 />
                                 {!isPasswordValid && (
-                                    <div className="text-red-500 text-sm">Mật khẩu phải có ít nhất 8 ký tự, có chữ hoa và ký tự đặc biệt</div>
+                                    <div className="text-red-500 text-sm">Mật khẩu phải có ít nhất 8 ký tự, có chữ hoa
+                                        và ký tự đặc biệt</div>
                                 )}
                             </div>
 
@@ -133,7 +140,7 @@ function Register() {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer/>
         </div>
     );
 }

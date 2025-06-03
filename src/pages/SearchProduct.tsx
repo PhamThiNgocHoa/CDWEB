@@ -9,23 +9,22 @@ import useCategory from "../hooks/useCategory";
 import {BookForm, BookFormDisplayName} from "../enums/BookForm";
 
 const SearchProduct = () => {
-    const {name} = useParams(); // lấy name từ URL
+    const {name} = useParams();
     const [products, setProducts] = useState<ProductResponse[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<ProductResponse[]>([]);
-    const [priceRange, setPriceRange] = useState<string>(""); // khoảng giá ví dụ: "0-50000"
-    const {fetchListFindByName} = useProduct(); // gọi API tìm kiếm
+    const [priceRange, setPriceRange] = useState<string>("");
+    const {fetchListFindByName} = useProduct();
     const navigate = useNavigate();
     const {categories} = useCategory();
     const [categoryId, setCategoryId] = useState<string | undefined>();
     const [form, setForm] = useState<BookForm | undefined>();
 
-    // Load sản phẩm theo name
     useEffect(() => {
         const search = async () => {
             if (name) {
                 const result = await fetchListFindByName(decodeURIComponent(name));
                 setProducts(result);
-                setFilteredProducts(result); // khởi tạo filtered là tất cả sản phẩm tìm được
+                setFilteredProducts(result);
             } else {
                 setProducts([]);
                 setFilteredProducts([]);
@@ -34,24 +33,20 @@ const SearchProduct = () => {
         search();
     }, [name]);
 
-    // Lọc products theo priceRange, categoryId, form mỗi khi các giá trị này hoặc products thay đổi
     useEffect(() => {
         let filtered = [...products];
 
-        // Lọc theo category
         if (categoryId) {
             filtered = filtered.filter((p) => p.categoryId === categoryId);
         }
 
-        // Lọc theo hình thức (form)
         if (form) {
             filtered = filtered.filter((p) => p.form === form);
         }
 
-        // Lọc theo khoảng giá
         if (priceRange) {
             const [minStr, maxStr] = priceRange.split("-");
-            const min = Number(minStr) * 1000; // nhân 1000 vì bạn định nghĩa giá trên select là 0-100 (nghìn)
+            const min = Number(minStr) * 1000;
             const max = Number(maxStr) * 1000;
             filtered = filtered.filter((p) => p.price >= min && p.price <= max);
         }

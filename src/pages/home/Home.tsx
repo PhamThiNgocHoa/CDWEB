@@ -12,7 +12,8 @@ import useCategory from "../../hooks/useCategory";
 import ListCategory from "../../components/ListCategory";
 import {Product} from "../../models/Product";
 import useProduct from "../../hooks/useProduct";
-import {ProductResponse} from "../../models/response/ProductResponse"; // Import component Error popup
+import {ProductResponse} from "../../models/response/ProductResponse";
+import useCustomer from "../../hooks/useCustomer"; // Import component Error popup
 
 const mainImages = [
     '../image/TrangUuDaiT525_840x320.webp',
@@ -56,6 +57,7 @@ const Home = () => {
     const toggleShowAllProducts = () => {
         setShowAllProducts(!showAllProducts);  // Thay đổi trạng thái khi nhấn nút "Xem thêm"
     };
+    const {user} = useCustomer();
 
     return (
         <>

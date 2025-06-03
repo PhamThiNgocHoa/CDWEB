@@ -1,7 +1,7 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Customer} from "../models/Customer";
 import {authenticate, login, register} from "../server/api/authentication/auth.post";
-import {checkUsername, getQuantity, getUser} from "../server/api/customers/customer.get";
+import {getQuantity, getUser} from "../server/api/customers/customer.get";
 import {initPasswordReset, resetPassword} from "../server/api/customers/customer.post";
 import {ChangePasswordDto} from "../models/ChangePasswordDto";
 import {changePassword} from "../server/api/customers/customer.patch";
@@ -10,11 +10,12 @@ import {IntrospectRequest} from "../models/request/IntrospectRequest";
 import {CustomerResponse} from "../models/response/CustomerResponse";
 
 function useCustomer() {
-    const [users, setUsers] = useState<Customer[]>([]);
+    const [users, setUsers] = useState<CustomerResponse[]>([]);
     const [user, setUser] = useState<CustomerResponse | null>(null);
     const [quantity, setQuantity] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [changePass, setChangePass] = useState<ChangePasswordDto>();
 
     const handleError = (error: unknown) => {
         const message = error instanceof Error ? error.message : "Unknown error occurred";
@@ -35,17 +36,26 @@ function useCustomer() {
         }
     };
 
-    const fetchUser = async () => {
-        setLoading(true);
-        try {
-            const userData = await getUser();
-            setUser(userData);
-        } catch (err) {
-            handleError(err);
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        const fetchUser = async () => {
+            setLoading(true);
+            try {
+                const userData = await getUser();
+                setUser(userData);
+            } catch (err) {
+                handleError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            fetchUser();
+        } else {
+            setUser(null);
         }
-    };
+    }, []);
+
 
     const fetchQuantity = async (userId: number) => {
         setLoading(true);
@@ -59,16 +69,6 @@ function useCustomer() {
         }
     };
 
-    const fetchCheckUsername = async (username: string) => {
-        setLoading(true);
-        try {
-            return await checkUsername(username);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const fetchRegister = async (fullname: string, username: string, email: string, password: string, phone: string) => {
         setLoading(true);
@@ -103,7 +103,7 @@ function useCustomer() {
         }
     };
 
-    const fetchChangePassword = async (customerId: number, dto: ChangePasswordDto) => {
+    const fetchChangePassword = async (customerId: string, dto: ChangePasswordDto) => {
         setLoading(true);
         try {
             return await changePassword(customerId, dto);
@@ -150,16 +150,15 @@ function useCustomer() {
         error,
         loading,
         handleLogin,
-        fetchUser,
         fetchQuantity,
         quantity,
-        fetchCheckUsername,
         fetchRegister,
         fetchInitPasswordReset,
         fetchResetPassword,
         fetchChangePassword,
         fetchUpdateCustomer,
-        fetchAuthenticate
+        fetchAuthenticate,
+        changePass,
     };
 }
 

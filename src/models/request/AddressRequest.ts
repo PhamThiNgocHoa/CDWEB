@@ -3,5 +3,5 @@ export interface AddressRequest {
     numberPhone: string;
     receiver: string;
     note: string;
-    customerId: number;
+    customerId: string;
 }

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faReceipt, faSignOut, faUser, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+import React, {useState, useEffect} from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faHeart, faReceipt, faSignOut, faUser, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
 import IconTextItem from "./IconTextItem";
-import { useAuth } from "../hooks/useAuth";
-import { Link, useNavigate } from "react-router-dom";
+import {useAuth} from "../hooks/useAuth";
+import {Link, useNavigate} from "react-router-dom";
 import useProduct from "../hooks/useProduct"; // Hook fetch sản phẩm
-import { ProductResponse } from "../models/response/ProductResponse"; // Kiểu dữ liệu sản phẩm
+import {ProductResponse} from "../models/response/ProductResponse"; // Kiểu dữ liệu sản phẩm
 import Notification from "./Notification";
 
 function Header() {
@@ -14,8 +14,8 @@ function Header() {
     const [suggestions, setSuggestions] = useState<ProductResponse[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const { isLoggedIn, handleLogout, setIsLoggedIn } = useAuth();
-    const { fetchListFindByName } = useProduct();
+    const {isLoggedIn, handleLogout, setIsLoggedIn} = useAuth();
+    const {fetchListFindByName} = useProduct();
     const navigate = useNavigate();
 
     const [showNotification, setShowNotification] = useState(false);
@@ -73,7 +73,7 @@ function Header() {
     return (
         <header>
             <div className="w-full h-full hidden xl:flex">
-                <img src="/image/image1.png" alt="Banner" />
+                <img src="/image/image1.png" alt="Banner"/>
             </div>
 
             <div className="w-full py-4 px-4 md:px-10 lg:px-20 flex justify-between items-center">
@@ -87,7 +87,8 @@ function Header() {
                 </div>
 
                 {/* Ô tìm kiếm */}
-                <div className="flex items-center flex-grow mx-4 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl border rounded-md h-12 relative">
+                <div
+                    className="flex items-center flex-grow mx-4 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl border rounded-md h-12 relative">
                     <input
                         type="text"
                         value={searchQuery}
@@ -115,7 +116,8 @@ function Header() {
 
                     {/* Hiển thị gợi ý tìm kiếm */}
                     {showSuggestions && suggestions.length > 0 && (
-                        <div className="absolute top-14 left-0 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
+                        <div
+                            className="absolute top-14 left-0 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
                             {suggestions.map((product: ProductResponse) => (
                                 <div key={product.id} className="p-2 hover:bg-gray-200 cursor-pointer">
                                     <Link to={`/productDetail/${product.id}`} className="flex items-center">
@@ -151,28 +153,36 @@ function Header() {
                         onClick={toggleMenu}
                     >
                         <div className="flex flex-col items-center justify-center cursor-pointer px-2 group">
-                            <FontAwesomeIcon className="text-gray-500 group-hover:text-red-500" icon={faUser} />
+                            <FontAwesomeIcon className="text-gray-500 group-hover:text-red-500" icon={faUser}/>
                             <p className="text-xs hidden lg:flex group-hover:text-red-500">Tài khoản</p>
                         </div>
                         {isMenuOpen && (
-                            <div className="absolute z-50 text-sm text-gray-400 bg-white border rounded-md shadow-lg mt-10 py-2 w-72">
+                            <div
+                                className="absolute z-50 text-sm text-gray-400 bg-white border rounded-md shadow-lg mt-10 py-2 w-72">
                                 {/* Nội dung menu khi đã đăng nhập */}
                                 {isLoggedIn ? (
                                     <>
-                                        <IconTextItem icon={faUser} text="Thành viên Book Store" />
-                                        <IconTextItem icon={faReceipt} text="Đơn hàng của tôi" />
-                                        <IconTextItem icon={faHeart} text="Thành viên Book Store" />
+                                        <Link to="/account">
+                                            <IconTextItem icon={faUser} text="Thành viên Book Store"/>
+                                        </Link>
+                                        <Link to="">
+                                            <IconTextItem icon={faReceipt} text="Đơn hàng của tôi"/>
+                                        </Link>
+                                        <Link to="">
+                                            <IconTextItem icon={faHeart} text="Thành viên Book Store"/>
+                                        </Link>
+
                                         <div onClick={handleLogout}>
-                                            <IconTextItem icon={faSignOut} text="Thoát" />
+                                            <IconTextItem icon={faSignOut} text="Thoát"/>
                                         </div>
                                     </>
                                 ) : (
                                     <>
                                         <a href="/login">
-                                            <IconTextItem icon={faUser} text="Đăng nhập" />
+                                            <IconTextItem icon={faUser} text="Đăng nhập"/>
                                         </a>
                                         <a href="/register">
-                                            <IconTextItem icon={faSignOut} text="Đăng ký" />
+                                            <IconTextItem icon={faSignOut} text="Đăng ký"/>
                                         </a>
                                     </>
                                 )}

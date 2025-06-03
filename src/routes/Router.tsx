@@ -9,13 +9,13 @@ import ProductList from "../components/ProductList";
 import ProductDetail from "../pages/ProductDetail";
 import Cart from "../pages/Cart";
 import SearchProduct from "../pages/SearchProduct";
-import Checkout from "../pages/Checkout";
+import Checkout from "../pages/checkout/Checkout";
 import OrderHistory from "../pages/OrderHistory";
 import OrderDetail from "../pages/OrderDetail";
 import ForgotPassword from "../pages/FogotPassword";
 import ResetPassword from "../pages/ResetPassword";
-import TestProductPage from "../pages/TestProductPage";
 import Account from "../pages/account/Account";
+import PaymentReturn from "../pages/checkout/PaymentReturn";
 
 const Router = () => {
     return (
@@ -37,7 +37,7 @@ const Router = () => {
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route path="/reset-password/:username" element={<ResetPassword/>}/>
             <Route path="/account" element={<Account/>}/>
-
+            <Route path="/payment-return" element={<PaymentReturn/>}/>
 
         </Routes>
     );

@@ -1,7 +1,13 @@
 import {AddressRequest} from "../../../models/request/AddressRequest";
-import {Address} from "../../../models/Address";
 import ApiService from "../ApiService";
 
-export const createAddress = async (addressResquest: AddressRequest): Promise<Address> => {
-    return ApiService.post("/api/address/", addressResquest);
-}
+export const createAddress = async (addressRequest: {
+    note: string;
+    address: string;
+    receiver: string;
+    numberPhone: string;
+    customerId: string
+}): Promise<AddressRequest | null> => {
+    const response = await ApiService.post("/api/address/", addressRequest);
+    return response;
+};
