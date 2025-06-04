@@ -19,5 +19,7 @@ export interface ProductResponse {
     categoryId?: string;
     categoryName?: string;
     discount?: number;
+    stock?: number;
+
 
 }

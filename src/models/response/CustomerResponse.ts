@@ -6,7 +6,7 @@ export interface CustomerResponse {
     username: string;
     password: string
     role?: string;
-    cartId: string;
+    cartId?: string;
 }
 
 

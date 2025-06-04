@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Customer} from "../models/Customer";
 import {authenticate, login, register} from "../server/api/authentication/auth.post";
 import {getQuantity, getUser} from "../server/api/customers/customer.get";
@@ -8,6 +8,7 @@ import {changePassword} from "../server/api/customers/customer.patch";
 import {updateCustomer} from "../server/api/customers/customer.put";
 import {IntrospectRequest} from "../models/request/IntrospectRequest";
 import {CustomerResponse} from "../models/response/CustomerResponse";
+import {useNavigate} from "react-router-dom";
 
 function useCustomer() {
     const [users, setUsers] = useState<CustomerResponse[]>([]);
@@ -16,6 +17,10 @@ function useCustomer() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [changePass, setChangePass] = useState<ChangePasswordDto>();
+    const [formData, setFormData] = useState({username: "", password: ""});
+    const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+    const navigate = useNavigate();
+
 
     const handleError = (error: unknown) => {
         const message = error instanceof Error ? error.message : "Unknown error occurred";
@@ -30,9 +35,25 @@ function useCustomer() {
             setUsers(userData);
             return userData;
         } catch (err) {
+            setNotification({message: "Mật khẩu hoặc tên đăng nhập sai", type: "error"});
             handleError(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormData((prev) => ({...prev, [name]: value}));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await handleLogin(formData.username, formData.password);
+            navigate("/home");
+        } catch (err) {
+            console.error("Login failed:", err);
         }
     };
 
@@ -55,20 +76,6 @@ function useCustomer() {
             setUser(null);
         }
     }, []);
-
-
-    const fetchQuantity = async (userId: number) => {
-        setLoading(true);
-        try {
-            const data = await getQuantity(userId);
-            setQuantity(data);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
 
     const fetchRegister = async (fullname: string, username: string, email: string, password: string, phone: string) => {
         setLoading(true);
@@ -117,7 +124,6 @@ function useCustomer() {
     const fetchUpdateCustomer = async (customerId: string | undefined, customer: {
         password: string;
         phone: string;
-        id: string | undefined;
         fullname: string;
         email: string;
         username: string
@@ -150,7 +156,6 @@ function useCustomer() {
         error,
         loading,
         handleLogin,
-        fetchQuantity,
         quantity,
         fetchRegister,
         fetchInitPasswordReset,
@@ -159,6 +164,13 @@ function useCustomer() {
         fetchUpdateCustomer,
         fetchAuthenticate,
         changePass,
+        setChangePass,
+        setUser,
+        handleChange,
+        handleSubmit,
+        formData,
+        notification,
+        setNotification
     };
 }
 

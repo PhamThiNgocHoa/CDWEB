@@ -83,6 +83,7 @@ const Home = () => {
                                         quantitySold={1}  // Bạn có thể thay số này nếu có dữ liệu đúng
                                         onClick={() => handleProductClick(product.id)}
                                     />
+
                                 ))}
                             </div>
                         </div>

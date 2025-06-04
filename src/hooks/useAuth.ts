@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 export const useAuth = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
+    const token = localStorage.getItem("authToken");
+
 
     const handleLogout = async () => {
         try {
@@ -66,5 +68,5 @@ export const useAuth = () => {
     };
 
 
-    return {isLoggedIn, handleLogout, setIsLoggedIn, fetchCheckUsername, fetchCheckEmail};
+    return {isLoggedIn, handleLogout, setIsLoggedIn, fetchCheckUsername, fetchCheckEmail, token};
 };

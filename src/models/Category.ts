@@ -4,5 +4,5 @@ export interface Category{
     id: number;
     name: string;
     img: string;
-    products: Product[];
+    products?: Product[];
 }

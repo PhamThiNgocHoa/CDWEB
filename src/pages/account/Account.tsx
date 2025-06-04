@@ -44,10 +44,6 @@ const Account = () => {
                                     onChangePassword={handleOpenPasswordPopup}
                                 />
                             )}
-                            {activeSection === "orders" && <OrderHistory/>}
-                            {activeSection === "favorites" && (
-                                <div>Sản phẩm yêu thích (chưa làm)</div>
-                            )}
                         </>
                     )}
                 </main>

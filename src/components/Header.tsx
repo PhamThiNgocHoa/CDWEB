@@ -7,12 +7,14 @@ import {Link, useNavigate} from "react-router-dom";
 import useProduct from "../hooks/useProduct"; // Hook fetch sản phẩm
 import {ProductResponse} from "../models/response/ProductResponse"; // Kiểu dữ liệu sản phẩm
 import Notification from "./Notification";
+import useCustomer from "../hooks/useCustomer";
 
 function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [suggestions, setSuggestions] = useState<ProductResponse[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const {user} = useCustomer();
 
     const {isLoggedIn, handleLogout, setIsLoggedIn} = useAuth();
     const {fetchListFindByName} = useProduct();
@@ -78,13 +80,15 @@ function Header() {
 
             <div className="w-full py-4 px-4 md:px-10 lg:px-20 flex justify-between items-center">
                 {/* Logo */}
-                <div className="logo flex-shrink-0">
-                    <img
-                        className="w-38 h-10"
-                        src="https://cdn1.fahasa.com/skin/frontend/ma_vanese/fahasa/images/fahasa-logo.png"
-                        alt="Logo"
-                    />
-                </div>
+                <Link to="/home">
+                    <div className="logo flex-shrink-0">
+                        <img
+                            className="w-38 h-10"
+                            src="https://cdn1.fahasa.com/skin/frontend/ma_vanese/fahasa/images/fahasa-logo.png"
+                            alt="Logo"
+                        />
+                    </div>
+                </Link>
 
                 {/* Ô tìm kiếm */}
                 <div
@@ -165,13 +169,14 @@ function Header() {
                                         <Link to="/account">
                                             <IconTextItem icon={faUser} text="Thành viên Book Store"/>
                                         </Link>
-                                        <Link to="">
+                                        <Link to={`/orderHistory/${user?.id}`}>
                                             <IconTextItem icon={faReceipt} text="Đơn hàng của tôi"/>
                                         </Link>
-                                        <Link to="">
-                                            <IconTextItem icon={faHeart} text="Thành viên Book Store"/>
-                                        </Link>
-
+                                        {user?.role === "ADMIN" && (
+                                            <Link to="/administration">
+                                                <IconTextItem icon={faHeart} text="Quản trị"/>
+                                            </Link>
+                                        )}
                                         <div onClick={handleLogout}>
                                             <IconTextItem icon={faSignOut} text="Thoát"/>
                                         </div>
