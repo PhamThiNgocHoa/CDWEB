@@ -16,9 +16,17 @@ import ForgotPassword from "../pages/FogotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Account from "../pages/account/Account";
 import PaymentReturn from "../pages/checkout/PaymentReturn";
+import Administration from "../pages/admin/Administration";
+import Header from "../components/Header";
+import ManageCategories from "../pages/admin/categories/ManageCategories";
+import ManageCoupons from "../pages/admin/discount/ManageCoupons";
+import ManageOrders from "../pages/admin/order/ManageOrders";
+import ManageProducts from "../pages/admin/product/ManageProducts";
+import ManageUser from "../pages/admin/user/ManageUser";
 
 const Router = () => {
     return (
+
         <Routes>
             {/* Định nghĩa các route */}
             <Route path="/home" element={<Home/>}/>
@@ -38,6 +46,13 @@ const Router = () => {
             <Route path="/reset-password/:username" element={<ResetPassword/>}/>
             <Route path="/account" element={<Account/>}/>
             <Route path="/payment-return" element={<PaymentReturn/>}/>
+            <Route path="/administration" element={<Administration/>}/>
+            <Route path="/manageCategories" element={<ManageCategories/>}/>
+            <Route path="/manageCoupons" element={<ManageCoupons/>}/>
+            <Route path="/manageOrders" element={<ManageOrders/>}/>
+            <Route path="/manageProducts" element={<ManageProducts/>}/>
+            <Route path="/manageUser" element={<ManageUser/>}/>
+
 
         </Routes>
     );

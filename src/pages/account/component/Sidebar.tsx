@@ -10,18 +10,7 @@ const Sidebar = ({ onSelectSection }: { onSelectSection: (section: string) => vo
             >
                 Thông tin tài khoản
             </button>
-            <button
-                onClick={() => onSelectSection("orders")}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded"
-            >
-                Đơn hàng của tôi
-            </button>
-            <button
-                onClick={() => onSelectSection("favorites")}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded"
-            >
-                Sản phẩm yêu thích
-            </button>
+
         </nav>
     </aside>
 );

@@ -61,6 +61,7 @@ const Checkout: React.FC = () => {
     const handleSubmit = async () => {
         if (selectedAddress == null) {
             setNotification({message: "Vui lòng chọn địa chỉ thanh toán!", type: "error"})
+            return;
         }
         const orderData: OrderRequest = {
             customerId: user?.id || "",
@@ -316,7 +317,7 @@ const Checkout: React.FC = () => {
                                     <p>{address.receiver} - {address.numberPhone}</p>
                                     <button
                                         type="button"
-                                        className="text-blue-600 text-sm px-2"
+                                        className="text-blue-600 text-md px-4 mt-2"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             openEditModal(address); // address ở đây là kiểu Address, bạn có thể cast về AddressRequest nếu cần
@@ -327,7 +328,7 @@ const Checkout: React.FC = () => {
 
                                     <button
                                         type="button"
-                                        className="text-red-600 text-sm"
+                                        className="text-red-600 text-md"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDeleteAddress(address.id);
@@ -342,7 +343,7 @@ const Checkout: React.FC = () => {
                     {isEditingModalOpen && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                             <div className="bg-white p-6 rounded-md w-full max-w-md shadow-lg">
-                                <h3 className="text-lg font-semibold mb-4">Chỉnh sửa địa chỉ</h3>
+                                <h3 className="text-lg font-semibold mb-2">Chỉnh sửa địa chỉ</h3>
                                 <input value={selectedAddress?.id}/>
 
                                 <input
@@ -396,7 +397,7 @@ const Checkout: React.FC = () => {
                                                 handleUpdateAddress(editingAddress.id, updatedAddressRequest);
                                             }
                                         }}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                                     >
                                         Cập nhật
                                     </button>
@@ -419,7 +420,7 @@ const Checkout: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={handleApplyDiscount}
-                                className="p-2 bg-blue-600 text-white rounded-r-md"
+                                className="p-2 bg-red-600 text-white rounded-r-md  hover:bg-red-700"
                             >
                                 Áp dụng
                             </button>
@@ -432,12 +433,14 @@ const Checkout: React.FC = () => {
                                     <div key={method} className="flex items-center">
                                         <input
                                             id={`payment-${method}`}
-                                            type="radio"
+                                            type="checkbox"
                                             value={method}
                                             checked={paymentMethod === method}
                                             onChange={() => setPaymentMethod(method)}
-                                            className="mr-2"
+                                            className="mr-2 w-3 h-3 "
+                                            style={{accentColor: 'red'}}
                                         />
+
                                         <label htmlFor={`payment-${method}`}>
                                             {OrderMethodDisplayName[method]}
                                         </label>
@@ -451,7 +454,7 @@ const Checkout: React.FC = () => {
                         <h3 className="font-medium text-lg mb-4">Đơn hàng của bạn</h3>
                         <table className="w-full text-left border border-gray-300 rounded-md">
                             <thead className="bg-gray-200">
-                            <tr>
+                            <tr className="text-white bg-red-600">
                                 <th className="py-2 px-4 border-b border-gray-300">Sản phẩm</th>
                                 <th className="py-2 px-4 border-b border-gray-300">Số lượng</th>
                                 <th className="py-2 px-4 border-b border-gray-300">Giá</th>
@@ -474,8 +477,8 @@ const Checkout: React.FC = () => {
                                 <td className="font-semibold py-2 px-4">{formatToVND(totalAmount)}</td>
                             </tr>
                             <tr>
-                                <td>Tiền sau khi giảm giá:</td>
-                                <td>{formatToVND(finalTotalAmoun ?? totalAmount)}</td>
+                                <td colSpan={3} className="text-right font-semibold py-2 px-4">Tiền sau khi giảm giá:</td>
+                                <td className="font-semibold py-2 px-4">{formatToVND(finalTotalAmoun ?? totalAmount)}</td>
                             </tr>
                             </tfoot>
                         </table>
@@ -484,7 +487,7 @@ const Checkout: React.FC = () => {
 
                     <button
                         onClick={handleSubmit}
-                        className="mt-6 w-full bg-green-600 text-white p-3 rounded-md hover:bg-green-700"
+                        className="mt-6 mb-10 w-full bg-red-600 text-white p-3 rounded-md hover:bg-red-700"
                     >
                         Đặt hàng
                     </button>

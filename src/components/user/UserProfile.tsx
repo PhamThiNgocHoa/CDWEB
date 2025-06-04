@@ -95,7 +95,6 @@ const UserProfile = () => {
         setLoading(true);
         try {
             await fetchUpdateCustomer(editUserId, {
-                id: id,              // nếu Customer interface yêu cầu
                 fullname: editFullname,
                 email: editEmail,
                 phone: editPhone,

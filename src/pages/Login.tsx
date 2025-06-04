@@ -1,38 +1,21 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import useCustomer from "../hooks/useCustomer";
+import Notification from "../components/Notification";
 
 function Login() {
-    const {handleLogin} = useCustomer();
-    const [formData, setFormData] = useState({username: "", password: ""});
-    const navigate = useNavigate();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setFormData((prev) => ({...prev, [name]: value}));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            await handleLogin(formData.username, formData.password);
-            navigate("/home");
-        } catch (err) {
-            console.error("Login failed:", err);
-        }
-    };
-
+    const {handleSubmit, formData, handleChange, notification, setNotification} = useCustomer();
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
-            {/* Header */}
             <Header/>
 
-            {/* Main Content - Form đăng nhập */}
             <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-                {/* Phần bên trái - Hình ảnh */}
+                {notification && (
+                    <Notification message={notification.message} type={notification.type}
+                                  onClose={() => setNotification(null)}/>
+                )}
                 <div className="flex justify-center items-center md:w-1/2 bg-blue-100 p-4">
                     <img
                         src="https://images.pexels.com/photos/810050/pexels-photo-810050.jpeg?cs=srgb&dl=blur-book-stack-books-810050.jpg&fm=jpg"
@@ -40,7 +23,6 @@ function Login() {
                         className="max-w-full max-h-96 object-contain"
                     />
                 </div>
-
                 {/* Phần bên phải - Form đăng nhập */}
                 <div className="flex justify-center items-center md:w-1/2 bg-gray-50 p-4">
                     <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">

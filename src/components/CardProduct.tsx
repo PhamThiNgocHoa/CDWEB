@@ -71,21 +71,31 @@ const CardProduct: React.FC<ProductProps> = (props) => {
 
     return (
         <div>
-            <div className="cursor-pointer bg-white rounded-lg border border-gray-300 shadow-lg p-2 py-4"
+            <div className="w-72 cursor-pointer bg-white rounded-lg border border-gray-300 shadow-lg p-2 py-4"
                  onClick={props.onClick}
             >
-                {/* Hình ảnh sản phẩm */}
                 <img src={props.img} alt={props.name} className="w-full h-48 object-cover rounded-md"/>
 
-                {/* Tiêu đề sản phẩm */}
-                {/* Tiêu đề sản phẩm */}
                 <h2 className="text-md truncate mt-3">
                     {props.name}
                 </h2>
 
                 {/* Giá sản phẩm */}
                 <div className="flex flex-row w-full justify-between gap-2 mt-2">
-                    <span className="text-red-500 font-bold">{formatToVND(props.price)}</span>
+                    {Number(props.discount) > 0 ? (
+                        <>
+                            <span className="text-red-600">
+                              {formatToVND(props.price * (1 - Number(props.discount)))}
+                            </span>
+
+                            <span className="line-through text-gray-500 text-sm mr-2">
+                              {formatToVND(props.price)}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-red-600">{formatToVND(props.price)}</span>
+                    )}
+
                     <span className="bg-red-500 p-1 rounded-md text-white text-xs">
                     {(props.discount ? props.discount * 100 : 0)} %
                 </span>
@@ -113,7 +123,7 @@ const CardProduct: React.FC<ProductProps> = (props) => {
                 </div>
 
             </div>
-            <button className="w-full bg-red-600 text-white p-2 rounded-md mt-4"
+            <button className="w-72 bg-red-600 text-white p-2 rounded-md mt-4"
                     onClick={handleAddToCart}>Thêm
                 vào
                 giỏ

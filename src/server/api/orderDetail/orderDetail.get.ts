@@ -6,8 +6,9 @@ export const getOrderDetailById = async (id: number): Promise<OrderDetailRespons
     return await ApiService.get(`/api/order-detail/id/${id}`);
 }
 
-export const getOrderDetailByOrderId = async (orderId: number): Promise<OrderDetailResponse[]> => {
-    return await ApiService.get(`/api/order-detail/orderId/${orderId}`);
+export const getOrderDetailByOrderId = async (orderId: string): Promise<OrderDetailResponse[]> => {
+    const response = await ApiService.get(`/api/order-detail/orderId/${orderId}`);
+    return response.data;
 }
 
 export const getOrderDetailByProductId = async (productId: number): Promise<OrderDetailResponse> => {

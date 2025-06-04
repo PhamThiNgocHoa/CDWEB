@@ -4,11 +4,11 @@ import ApiService from "../ApiService";
 export const updateCustomer = async (customerId: string | undefined, customer: {
     password: string;
     phone: string;
-    id: string | undefined;
     fullname: string;
     email: string;
     username: string
 }): Promise<void> => {
-    return ApiService.put(`/api/customer/${customerId}`, customer);
+    const response = await ApiService.put(`/api/customer/${customerId}`, customer);
+    return response.message;
 
 };

@@ -7,32 +7,29 @@ import useCart from "../hooks/useCart";
 import {getCurrentUserId} from "../utils/authUtils";
 import useCartItem from "../hooks/useCartItem";
 import {CartItemRequest} from "../models/request/CartItemRequest";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import Notification from "../components/Notification";
+import {CartItemResponse} from "../models/response/CartItemResponse";
 
 const Cart = () => {
 
     const tokenData = getCurrentUserId();
     const customerId = tokenData || undefined;
     const {fetchCart} = useCart(customerId);
-
+    const navigator = useNavigate();
     const {cartData, loading, error} = useCart(customerId);
 
-    const [cartItems, setCartItems] = useState<any[]>([]);
+    const [cartItems, setCartItems] = useState<CartItemResponse[]>([]);
     const {fetchDeleteCartItem, fetchUpdateQuantityCartItem} = useCartItem();
+    const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
 
     useEffect(() => {
         if (cartData?.cartItems) {
-            const itemsWithSelect = cartData.cartItems.map(item => ({
-                id: item.id,
-                name: item.product.name,
-                image: item.product.img,
-                price: item.product.price,
-                quantity: item.quantity,
-                selected: false,
-            }));
-            setCartItems(itemsWithSelect);
+            setCartItems(cartData.cartItems);
         }
     }, [cartData]);
+
 
     const handleQuantityChange = async (id: string, action: "increase" | "decrease") => {
         let updatedItems = [...cartItems];
@@ -54,8 +51,8 @@ const Cart = () => {
             setCartItems(updatedItems);
 
             const cartItemRequest: CartItemRequest = {
-                cartId: itemToUpdate.cartId,
-                productId: itemToUpdate.productId,
+                cartId: itemToUpdate.id,
+                productId: itemToUpdate.product.id,
                 quantity: newQuantity,
             };
 
@@ -73,9 +70,18 @@ const Cart = () => {
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            return total + item.price * item.quantity;
+            return total + (item.product.price * item.quantity * (1 - Number(item.product.discount)));
         }, 0);
     };
+
+    const handSubmit = async () => {
+        if (cartData?.cartItems.length === 0) {
+            setNotification({message: "Giỏ hàng trống!", type: "error"});
+            return;
+        } else {
+            navigator("/checkout");
+        }
+    }
 
 
     if (loading) {
@@ -101,6 +107,11 @@ const Cart = () => {
     return (
         <>
             <Header/>
+            {notification && (
+                <Notification message={notification.message} type={notification.type}
+                              onClose={() => setNotification(null)}/>
+
+            )}
             <div className="bg-gray-100">
                 <div className="grid grid-cols-1 md:grid-cols-2 py-6 max-w-7xl mx-auto pb-4">
                     <div>
@@ -130,14 +141,12 @@ const Cart = () => {
                                     {formatToVND(calculateTotal())}
                                 </span>
                             </div>
-                            <Link to="/checkout">
-                                <button
-                                    className="w-full py-3 bg-red-500 text-white rounded-md"
-                                >
-                                    THANH TOÁN
-                                </button>
-                            </Link>
-
+                            <button
+                                onClick={handSubmit}
+                                className="w-full py-3 bg-red-500 text-white rounded-md"
+                            >
+                                THANH TOÁN
+                            </button>
                         </div>
                     </div>
                 </div>

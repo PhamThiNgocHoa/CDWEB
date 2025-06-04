@@ -5,12 +5,10 @@ import React, {useEffect, useState} from "react";
 import formatToVND from "../hooks/formatToVND";
 import {useNavigate, useParams} from "react-router-dom";
 import {getProductById} from "../server/api/product/product.get";
-import {Product} from "../models/Product";
 import useCartItem from "../hooks/useCartItem";
 import {CartItemRequest} from "../models/request/CartItemRequest";
 import {getUser} from "../server/api/customers/customer.get";
 import Notification from "../components/Notification";
-import useProduct from "../hooks/useProduct";
 import {ProductResponse} from "../models/response/ProductResponse";
 
 const ProductDetail = () => {
@@ -145,14 +143,27 @@ const ProductDetail = () => {
                         <div className="w-1/2 p-4">
                             <div className="bg-white p-2 px-4">
                                 <h2 className="text-2xl font-bold mb-4">{product?.name}</h2>
-                                <div className="flex">
-                                  <span className="text-xl text-red-500 mb-4 font-bold">
+                                {Number(product?.discount) > 0 ? (
+                                    <div className="flex">
+                                    <span className="text-xl text-red-500 mb-4 font-bold">
+                                    {formatToVND((Number(product?.price) * (1 - Number(product?.discount))))}
+                                  </span>
+
+                                        <span
+                                            className="bg-red-500 rounded-md h-4 px-2 py-1 text-white text-xs pb-6 ml-10">
+                                            {product?.discount ? `${(product?.discount * 100).toFixed(0)} %` : "0 %"}
+                                        </span>
+                                        <span className="text-md line-through text-gray-500 mb-4 font-bold ml-10">
                                     {formatToVND((product?.price ?? 0))}
                                   </span>
-                                    <span className="bg-red-500 rounded-md h-4 px-2 py-1 text-white text-xs pb-6 ml-10">
-                                        {product?.discount ? `${(product?.discount * 100).toFixed(0)} %` : "0 %"}
+                                    </div>
+                                ) : (
+                                    <div className="mb-4">
+                                        <span className="text-xl text-red-500 font-bold ml-2">
+                                        {formatToVND((product?.price ?? 0))}
                                     </span>
-                                </div>
+                                    </div>
+                                )}
 
                                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
                                     <button
@@ -254,7 +265,8 @@ const ProductDetail = () => {
             </div>
             <Footer/>
         </>
-    );
+    )
+        ;
 };
 
 export default ProductDetail;
