@@ -1,6 +1,6 @@
-import {OrderMethod} from "../../../enums/OrderMethod";
+import { OrderMethod } from "../../../enums/OrderMethod";
 import ApiService from "../ApiService";
-import {OrderDetailRequest} from "../../../models/request/OrderDetailRequest";
+import { OrderDetailRequest } from "../../../models/request/OrderDetailRequest";
 
 export const createOrder = async (
     order: {
@@ -9,15 +9,14 @@ export const createOrder = async (
         receiver: string;
         discountCode: string;
         numberPhone: any;
-        customerId: string
+        customerId: string;
     },
     method: OrderMethod
 ) => {
     try {
-        const response = await ApiService.post(`/api/order?method=${method}`, order, {});
+        const response = await ApiService.post(`/api/order?method=${method}`, order);
         return response.data;
-    } catch (error: any) {
-        console.log("Full error:", error);
+    } catch {
     }
 };
 
@@ -30,29 +29,20 @@ export const getTotalAmount = async (
             `/api/order/total-amount?discountCode=${discountCode}`,
             orderDetails
         );
-
-        // Trả về số tiền từ response
         return response.data;
-    } catch (error: any) {
-        console.error("Error getting total amount:", error);
+    } catch {
         return undefined;
     }
 };
+
 export const checkDiscount = async (discountCode: string): Promise<void> => {
     try {
         const response = await ApiService.post(`/api/order/check-discount?discountCode=${discountCode}`, {});
-
-        if (response.code === 200) {
-            return;
+        if (response.code !== 200) {
+            throw new Error(response.message || 'Mã giảm giá không hợp lệ');
         }
-
-        throw new Error(response.message || 'Mã giảm giá không hợp lệ');
-
     } catch (error: any) {
-        const serverMessage =
-            error?.response?.data?.message ||
-            'Mã giảm giá không hợp lệ hoặc đã hết hạn';
-
+        const serverMessage = error?.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn';
         const serverCode = error?.response?.data?.code;
 
         throw new Error(
@@ -62,5 +52,3 @@ export const checkDiscount = async (discountCode: string): Promise<void> => {
         );
     }
 };
-
-

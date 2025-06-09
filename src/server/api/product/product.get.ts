@@ -9,9 +9,18 @@ export const getProductById = async (productId: string): Promise<ProductResponse
     return result.data;
 }
 export const getListProduct = async (): Promise<ProductResponse[]> => {
-    const result = await ApiService.get("/api/product/list", false);
-    return result.data;
+    try {
+        const result = await ApiService.get("/api/product/list", {}, {}, false);
+        return result.data;
+    } catch (error: any) {
+        // Nếu muốn có thêm log lỗi, hoặc xử lý ở đây
+        // console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+
+        // Ném lỗi lên cho caller xử lý tiếp
+        throw error;
+    }
 };
+
 
 export const searchProduct = async (name: string): Promise<ProductResponse[]> => {
     const result = await ApiService.get(`/api/product/search?name=${encodeURIComponent(name)}`, false);
@@ -25,7 +34,7 @@ export const getListCategory = async (categoryId: number): Promise<Category[]> =
     return ApiService.get(`/api/product//list/${categoryId}`);
 };
 export const getProductSale = async (): Promise<ProductResponse[]> => {
-    const result = await ApiService.get("/api/product/sale", false);
+    const result = await ApiService.get("/api/product/sale", {}, {}, false);
     return result.data;
 }
 

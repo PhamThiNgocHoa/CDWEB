@@ -1,80 +1,84 @@
-import {useCallback, useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {OrderDetailRequest} from "../models/request/OrderDetailRequest";
-import {OrderMethod} from "../enums/OrderMethod";
-import {createOrder} from "../server/api/order/order.post";
-import {createPayment} from "../server/api/payment/payment.post";
-import {getOrderByCustomerId} from "../server/api/order/order.get";
-import {OrderResponse} from "../models/response/OrderResponse";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { OrderDetailRequest } from "../models/request/OrderDetailRequest";
+import { OrderMethod } from "../enums/OrderMethod";
+import { createOrder } from "../server/api/order/order.post";
+import { createPayment } from "../server/api/payment/payment.post";
+import { getOrderByCustomerId } from "../server/api/order/order.get";
+import { OrderResponse } from "../models/response/OrderResponse";
 import useCustomer from "./useCustomer";
-import {OrderStatus} from "../enums/OrderStatus";
-import {changeOrderStatus} from "../server/api/order/order.put";
+import { OrderStatus } from "../enums/OrderStatus";
+import { changeOrderStatus } from "../server/api/order/order.put";
+import { useToken } from "./useToken"; // ✅ dùng useToken thay vì useAuth
 
 const useOrder = () => {
     const navigate = useNavigate();
     const [orderId, setOrderId] = useState<string | undefined>(undefined);
     const [orders, setOrders] = useState<OrderResponse[]>();
-    const [error, setError] = useState<string | null>(null);
     const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [loading, setLoading] = useState(false);
-
-    const {user} = useCustomer();
-
-    const token = localStorage.getItem("authToken");
-    if (!token || token.trim() === "" || token === "null") {
-        setError("Không có token đăng nhập");
-    }
+    const [error, setError] = useState<string | null>(null);
+    const { user } = useCustomer();
+    const token = useToken();
 
     const fetchCreateOrderAndPayment = useCallback(
-            async (
-                order: {
-                    orderDetails: OrderDetailRequest[];
-                    address: string;
-                    receiver: string;
-                    discountCode: string;
-                    numberPhone: any;
-                    customerId: string;
-                },
-                method: OrderMethod
-            ): Promise<void> => {
-                if (!token) {
-                    setError("Không có token đăng nhập");
-                    return;
-                }
-                setLoading(true);
-                setError(null);
-                try {
-                    const orderResponse = await createOrder(order, method);
-                    setOrderId(orderResponse);
-
-                    if (method === OrderMethod.VN_PAY) {
-                        const returnUrl = `${window.location.origin}/payment-return`;
-
-                        const paymentUrl = await createPayment(orderResponse ?? "", returnUrl);
-
-                        if (paymentUrl) {
-                            window.location.href = paymentUrl;
-                        } else {
-                            throw new Error("Không lấy được đường dẫn thanh toán");
-                        }
-                    } else {
-                        navigate("/");
-                    }
-                } catch (error) {
-                    console.error("Lỗi khi tạo đơn hàng hoặc thanh toán:", error);
-                    throw error;
-                }
+        async (
+            order: {
+                orderDetails: OrderDetailRequest[];
+                address: string;
+                receiver: string;
+                discountCode: string;
+                numberPhone: any;
+                customerId: string;
             },
-            [navigate]
-        )
-    ;
+            method: OrderMethod
+        ): Promise<void> => {
+            console.log("fetchCreateOrderAndPayment gọi với", order, method, "token =", token);
+            if (!token) {
+                console.log("Không có token đăng nhập");
+                setError("Không có token đăng nhập");
+                return;
+            }
+
+            setLoading(true);
+            setError(null);
+            try {
+                const orderResponse = await createOrder(order, method);
+                setOrderId(orderResponse);
+
+                if (method === OrderMethod.VN_PAY) {
+                    const returnUrl = `${window.location.origin}/payment-return`;
+                    const paymentUrl = await createPayment(orderResponse ?? "", returnUrl);
+
+                    if (paymentUrl) {
+                        window.location.href = paymentUrl;
+                    } else {
+                        throw new Error("Không lấy được đường dẫn thanh toán");
+                    }
+                } else {
+                    navigate("/");
+                }
+            } catch (error) {
+                console.error("Lỗi khi tạo đơn hàng hoặc thanh toán:", error);
+                throw error;
+            } finally {
+                setLoading(false);
+            }
+        },
+        [navigate, token]
+    );
 
     useEffect(() => {
         const fetchOrders = async () => {
             if (!token) {
                 setError("Không có token đăng nhập");
-                return null;
+                return;
             }
+
+            if (user?.role !== "USER") {
+                return;
+            }
+
             setLoading(true);
             setError(null);
             try {
@@ -84,12 +88,13 @@ const useOrder = () => {
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchOrders();
-    }, [user]);
-
+    }, [user, token]);
 
     const handleCancelOrder = async (orderId: string, status: OrderStatus) => {
         if (!token || token.trim() === "" || token === "null") {
@@ -100,12 +105,12 @@ const useOrder = () => {
         try {
             if (status === OrderStatus.PENDING || status === OrderStatus.PENDING_PAYMENT) {
                 await changeOrderStatus(OrderStatus.CANCELLED, orderId);
-                setNotification({message: "Đơn hàng đã bị hủy thành công!", type: "success"});
+                setNotification({ message: "Đơn hàng đã bị hủy thành công!", type: "success" });
             } else {
-                setNotification({message: "Không thể hủy đơn hàng đã xử lý hoặc đã giao!", type: "error"});
+                setNotification({ message: "Không thể hủy đơn hàng đã xử lý hoặc đã giao!", type: "error" });
             }
         } catch (error) {
-            setNotification({message: "Lỗi khi hủy đơn hàng!", type: "error"});
+            setNotification({ message: "Lỗi khi hủy đơn hàng!", type: "error" });
             setError("Không thể hủy đơn hàng");
         }
     };
@@ -121,7 +126,7 @@ const useOrder = () => {
         handleCancelOrder,
         handleViewDetail,
         notification,
-        setNotification
+        setNotification,
     };
 };
 

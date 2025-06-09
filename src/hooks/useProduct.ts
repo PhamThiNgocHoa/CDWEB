@@ -10,6 +10,7 @@ import {
 } from "../server/api/product/product.get";
 import {BookForm} from "../enums/BookForm";
 import {ProductResponse} from "../models/response/ProductResponse";
+import useCustomer from "./useCustomer";
 
 type FilterParams = {
     name?: string;
@@ -25,6 +26,7 @@ function useProduct() {
     const [loading, setLoading] = useState<boolean>(false);
     const [saleProducts, setSaleProducts] = useState<ProductResponse[]>([]);
     const [params, setParams] = useState<FilterParams>({});
+    const {user} = useCustomer();
 
     const handleError = (error: unknown) => {
         const message = error instanceof Error ? error.message : "Unknown error occurred";

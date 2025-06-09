@@ -7,31 +7,29 @@ interface CouponFormProps {
 
 function CouponForm({ onAdd }: CouponFormProps) {
     const [code, setCode] = useState("");
-    const [percent, setPercent] = useState<number>(0); // đổi từ discount thành percent
+    const [percent, setPercent] = useState<number>(0);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!code.trim() || percent <= 0 || !endDate) {
             alert("Vui lòng nhập đầy đủ thông tin hợp lệ.");
             return;
         }
 
-        const newCoupon: Omit<Discount, "id"> = {
-            code: code.trim(),
-            percent,
-            startDate: startDate,
-            endDate,
-            active: true,
-        };
+        const newCoupon = { code: code.trim(), percent, startDate, endDate, active: true };
 
-        onAdd(newCoupon);
-        setCode("");
-        setPercent(0);
-        setStartDate("");
-        setEndDate("");
-    };
+        try {
+            await onAdd(newCoupon); // đảm bảo chờ thêm thành công mới reset
+            setCode("");
+            setPercent(0);
+            setStartDate("");
+            setEndDate("");
+        } catch {
+            alert("Thêm mã giảm giá thất bại!");
+        }
+    }
 
     return (
         <form onSubmit={handleSubmit} className="mb-6 p-4 bg-white rounded shadow">

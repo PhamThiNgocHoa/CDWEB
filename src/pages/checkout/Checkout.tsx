@@ -76,8 +76,9 @@ const Checkout: React.FC = () => {
         };
         try {
             const result = await fetchCreateOrderAndPayment(orderData, paymentMethod);
-        } catch (err) {
-
+            console.log("Đặt hàng thành công, result:", result);
+        } catch (error) {
+            console.error("Lỗi khi gọi fetchCreateOrderAndPayment:", error);
         }
     };
 

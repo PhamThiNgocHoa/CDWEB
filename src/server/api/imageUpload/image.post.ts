@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-export const uploadImage = async (file: File): Promise<any> => {
+export const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -11,7 +11,7 @@ export const uploadImage = async (file: File): Promise<any> => {
                 "Content-Type": "multipart/form-data",
             },
         });
-        return response.data;
+        return response.data.url;
     } catch (error) {
         console.error("Lỗi khi tải lên hình ảnh:", error);
         throw error;

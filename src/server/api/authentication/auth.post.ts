@@ -40,7 +40,7 @@ export const login = async (username: string, password: string): Promise<any> =>
         if (user) {
             localStorage.setItem("userId", user.id);
             localStorage.setItem("username", user.username);
-            localStorage.setItem("user", JSON.stringify(user)); // lưu toàn bộ nếu cần
+            localStorage.setItem("user", JSON.stringify(user));
         }
 
         return {success: true};

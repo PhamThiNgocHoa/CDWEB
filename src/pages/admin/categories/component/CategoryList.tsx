@@ -1,59 +1,68 @@
-import {Category} from "../../../../models/Category";
+import React, { useState } from "react";
+import { Category } from "../../../../models/Category";
 import CategoryRow from "./CategoryRow";
 
 type CategoryListProps = {
     categories: Category[];
-    editCategoryId: number | null;
-    editCategoryName: string;
-    editCategoryImg: string;
-    onStartEdit: (id: number, name: string, img: string) => void;
-    onChangeEditName: (name: string) => void;
-    onChangeEditImg: (file: File | null) => void;
-    onSaveEdit: () => void;
-    onCancelEdit: () => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
+    onSaveEdit: (id: string, name: string, description: string, code: string) => void;
 };
+
 const CategoryList: React.FC<CategoryListProps> = ({
                                                        categories,
-                                                       editCategoryId,
-                                                       editCategoryName,
-                                                       editCategoryImg,
-                                                       onStartEdit,
-                                                       onChangeEditName,
-                                                       onChangeEditImg,
-                                                       onSaveEdit,
-                                                       onCancelEdit,
                                                        onDelete,
+                                                       onSaveEdit,
                                                    }) => {
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filteredCategories = categories.filter((cat) => {
+        const term = searchTerm.toLowerCase();
+        const idStr = String(cat.id).toLowerCase();
+        return (
+            idStr.includes(term) || cat.name.toLowerCase().includes(term)
+        );
+    });
+
     return (
-        <table className="min-w-full bg-white rounded shadow">
-            <thead>
-            <tr className="bg-gray-200 text-left">
-                <th className="p-3">ID</th>
-                <th className="p-3">Ảnh</th>
-                <th className="p-3">Tên danh mục</th>
-                <th className="p-3">Thao tác</th>
-            </tr>
-            </thead>
-            <tbody>
-            {categories.map((category) => (
-                <CategoryRow
-                    key={category.id}
-                    category={category}
-                    isEditing={editCategoryId === category.id}
-                    editCategoryName={editCategoryName}
-                    editCategoryImg={editCategoryImg}
-                    onStartEdit={onStartEdit}
-                    onChangeEditName={onChangeEditName}
-                    onChangeEditImg={onChangeEditImg}
-                    onSaveEdit={onSaveEdit}
-                    onCancelEdit={onCancelEdit}
-                    onDelete={onDelete}
-                />
-            ))}
-            </tbody>
-        </table>
+        <div>
+            <input
+                type="text"
+                placeholder="Tìm kiếm theo ID hoặc tên..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border rounded px-3 py-1 mb-4 w-full max-w-sm"
+            />
+
+            <table className="w-full border-collapse border bg-white">
+                <thead>
+                <tr className="bg-red-200">
+                    <th className="border p-2">ID</th>
+                    <th className="border p-2">Tên</th>
+                    <th className="border p-2">Mô tả</th>
+                    <th className="border p-2">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                {filteredCategories.length > 0 ? (
+                    filteredCategories.map((category) => (
+                        <CategoryRow
+                            key={category.id}
+                            category={category}
+                            onDelete={onDelete}
+                            onSaveEdit={onSaveEdit}
+                        />
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan={4} className="text-center p-4">
+                            Không tìm thấy danh mục phù hợp
+                        </td>
+                    </tr>
+                )}
+                </tbody>
+            </table>
+        </div>
     );
 };
-export default CategoryList;
 
+export default CategoryList;

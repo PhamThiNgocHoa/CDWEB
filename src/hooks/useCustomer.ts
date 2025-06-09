@@ -9,6 +9,9 @@ import {updateCustomer} from "../server/api/customers/customer.put";
 import {IntrospectRequest} from "../models/request/IntrospectRequest";
 import {CustomerResponse} from "../models/response/CustomerResponse";
 import {useNavigate} from "react-router-dom";
+import {getCustomer, getCustomers} from "../server/api/admin/admin.get";
+import {useAuth} from "./useAuth";
+import {useToken} from "./useToken";
 
 function useCustomer() {
     const [users, setUsers] = useState<CustomerResponse[]>([]);
@@ -20,6 +23,7 @@ function useCustomer() {
     const [formData, setFormData] = useState({username: "", password: ""});
     const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const navigate = useNavigate();
+    const token = useToken();
 
 
     const handleError = (error: unknown) => {
@@ -59,6 +63,10 @@ function useCustomer() {
 
     useEffect(() => {
         const fetchUser = async () => {
+            if (!token) {
+                setError("Không có token đăng nhập");
+                return null;
+            }
             setLoading(true);
             try {
                 const userData = await getUser();
@@ -69,13 +77,9 @@ function useCustomer() {
                 setLoading(false);
             }
         };
-        const token = localStorage.getItem("authToken");
-        if (token) {
-            fetchUser();
-        } else {
-            setUser(null);
-        }
-    }, []);
+        fetchUser();
+
+    }, [token]);
 
     const fetchRegister = async (fullname: string, username: string, email: string, password: string, phone: string) => {
         setLoading(true);
@@ -150,6 +154,8 @@ function useCustomer() {
         }
     }
 
+    // ADMIN
+
     return {
         user,
         users,
@@ -170,7 +176,7 @@ function useCustomer() {
         handleSubmit,
         formData,
         notification,
-        setNotification
+        setNotification,
     };
 }
 

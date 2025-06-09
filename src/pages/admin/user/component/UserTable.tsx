@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {CustomerResponse} from "../../../../models/response/CustomerResponse";
 import UserItem from "./UserItem";
-
+import {CustomerRequest} from "../../../../models/request/CustomerRequest";
 
 
 interface Props {
@@ -34,9 +34,10 @@ function UserTable({users, onDelete, onEdit}: Props) {
                         key={user.id}
                         user={user}
                         onDelete={onDelete}
-                        onEdit={onEdit}
+                        onEdit={(customerRequest) => onEdit(customerRequest)}
                         onView={handleView}
                     />
+
                 ))}
                 </tbody>
             </table>

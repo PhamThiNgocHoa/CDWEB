@@ -2,14 +2,10 @@ import React from 'react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-
-interface RevenueData {
-    month: string;
-    revenue: number;
-}
+import {MonthlyRevenueResponse} from "../../../models/response/MonthlyRevenueResponse";
 
 interface RevenueChartProps {
-    data: RevenueData[];
+    data: MonthlyRevenueResponse[];
 }
 
 function RevenueChart({ data }: RevenueChartProps) {

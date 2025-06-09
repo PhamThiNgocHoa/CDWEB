@@ -2,7 +2,7 @@ import ApiService from "../ApiService";
 import {CustomerResponse} from "../../../models/response/CustomerResponse";
 
 export const getUser = async (): Promise<CustomerResponse> => {
-    const result = await ApiService.get("/api/customer/profile");
+    const result = await ApiService.get("/api/customer/profile", {}, {}, true);
     return result.data;
 };
 

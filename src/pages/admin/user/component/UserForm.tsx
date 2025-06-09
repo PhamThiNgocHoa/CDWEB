@@ -1,41 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { Customer } from "../../../../models/Customer";
+import { CustomerRequest } from "../../../../models/request/CustomerRequest";
 
 interface Props {
     user: Customer | null;
-    onSubmit: (user: Customer) => void;
-    onCancel?: () => void;  // thêm prop onCancel cho nút Hủy
+    onSubmit: (user: CustomerRequest) => void;
+    onCancel?: () => void;
 }
 
 function UserForm({ user, onSubmit, onCancel }: Props) {
-    const [form, setForm] = useState<Customer>({
+    const [form, setForm] = useState<CustomerRequest>({
         fullname: "",
         password: "",
         phone: "",
-        resetCode: "",
         username: "",
-        id: "",
         email: "",
-        role: "user",
     });
 
     useEffect(() => {
-        if (user) setForm(user);
-        else
+        if (user) {
             setForm({
-                id: "",
+                fullname: user.fullname,
+                email: user.email,
+                phone: user.phone,
+                username: user.username,
+                password: user.password,
+            });
+        } else {
+            setForm({
                 fullname: "",
                 password: "",
                 phone: "",
-                resetCode: "",
                 username: "",
                 email: "",
-                role: "user",
             });
+        }
     }, [user]);
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+        e: React.ChangeEvent<HTMLInputElement>
     ) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
@@ -48,19 +51,16 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
 
     const handleCancel = () => {
         setForm({
-            id: "",
             fullname: "",
             password: "",
             phone: "",
-            resetCode: "",
             username: "",
             email: "",
-            role: "user",
         });
         if (onCancel) onCancel();
     };
 
-    const isEditing = Boolean(form.id);
+    const isEditing = Boolean(user?.id);
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 shadow rounded mb-6 space-y-3">
@@ -85,7 +85,7 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    placeholder="Số điện thọại"
+                    placeholder="Số điện thoại"
                     className="border p-2 rounded"
                     required
                 />
@@ -104,18 +104,9 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
                     onChange={handleChange}
                     placeholder="Mật khẩu"
                     className="border p-2 rounded"
-                    required
+                    required={!isEditing}
                     readOnly={isEditing}
                 />
-                <select
-                    name="role"
-                    value={form.role}
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                >
-                    <option value="USER">USER</option>
-                    <option value="ADMIN">ADMIN</option>
-                </select>
             </div>
             <div className="space-x-3">
                 <button
