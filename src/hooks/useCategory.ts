@@ -16,13 +16,18 @@ function useCategory() {
         throw new Error(message);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getListCategory()
+    const refreshCategories = async () => {
+        try {
+            const data = await getListCategory();
             setCategories(data);
+        } catch (error) {
+            handleError(error);
         }
-        fetchData();
-    }, [getListCategory]);
+    };
+
+    useEffect(() => {
+        refreshCategories();
+    }, []);
 
     const fetchGetCategoryById = async (id: number): Promise<Category | null> => {
         try {
@@ -40,6 +45,7 @@ function useCategory() {
         error,
         fetchGetCategoryById,
         setCategories,
+        refreshCategories,
     };
 }
 

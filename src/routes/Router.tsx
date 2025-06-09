@@ -1,7 +1,6 @@
 import React from 'react';
 import {Route, Routes} from 'react-router-dom';
 import Login from '../pages/Login';
-import UserProfile from '../components/user/UserProfile';
 import CategoryList from '../components/user/CategoryList';
 import Home from '../pages/home/Home';
 import Register from "../pages/Regiter";
@@ -16,7 +15,7 @@ import ForgotPassword from "../pages/FogotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Account from "../pages/account/Account";
 import PaymentReturn from "../pages/checkout/PaymentReturn";
-import Administration from "../pages/admin/Administration";
+import Administration from "../pages/admin/dasboard/Administration";
 import Header from "../components/Header";
 import ManageCategories from "../pages/admin/categories/ManageCategories";
 import ManageCoupons from "../pages/admin/discount/ManageCoupons";
@@ -29,9 +28,9 @@ const Router = () => {
 
         <Routes>
             {/* Định nghĩa các route */}
+            {/*    user*/}
             <Route path="/home" element={<Home/>}/>
             <Route path="/" element={<Home/>}/> {/* Đặt Home là mặc định */}
-            <Route path="/userProfile" element={<UserProfile/>}/>
             <Route path="/category" element={<CategoryList/>}/>
             <Route path="/s" element={<ProductList/>}/>
             <Route path="/register" element={<Register/>}/>
@@ -46,6 +45,9 @@ const Router = () => {
             <Route path="/reset-password/:username" element={<ResetPassword/>}/>
             <Route path="/account" element={<Account/>}/>
             <Route path="/payment-return" element={<PaymentReturn/>}/>
+
+
+            {/*    admin*/}
             <Route path="/administration" element={<Administration/>}/>
             <Route path="/manageCategories" element={<ManageCategories/>}/>
             <Route path="/manageCoupons" element={<ManageCoupons/>}/>

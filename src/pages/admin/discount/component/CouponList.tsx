@@ -1,35 +1,39 @@
 import React, {useState} from "react";
 import {Discount} from "../../../../models/Discount";
 
-interface CouponListProps {
+type Props = {
     coupons: Discount[];
-    onDelete: (id: string) => void;
-    onUpdate: (coupon: { endDate: string; code: string; percent: number; id: string }) => void;
-}
+    onDelete: (code: string) => void;
+    onUpdate: (coupon: Discount) => void;
+};
 
-function CouponList({coupons, onDelete, onUpdate}: CouponListProps) {
+function CouponList({coupons, onDelete, onUpdate}: Props) {
     const [editId, setEditId] = useState<string | null>(null);
     const [editCode, setEditCode] = useState("");
     const [editDiscount, setEditDiscount] = useState(0);
+    const [editStartDate, setEditStartDate] = useState("");
     const [editExpiryDate, setEditExpiryDate] = useState("");
 
-    const startEditing = (coupon: { code: string; endDate: string; id: string; percent: number }) => {
-        setEditId(coupon.id ?? "");
-        setEditCode(coupon.code);
+    const startEditing = (coupon: Discount) => {
+        setEditId(coupon.id);
+        setEditCode(coupon.code ?? "");
         setEditDiscount(coupon.percent);
-        setEditExpiryDate(coupon.endDate);
+        setEditStartDate(coupon.startDate ?? "");
+        setEditExpiryDate(coupon.endDate ?? "");
     };
 
-    const cancelEdit = () => {
-        setEditId(null);
-    };
+    const cancelEdit = () => setEditId(null);
 
     const saveEdit = () => {
-        if (!editCode.trim() || editDiscount <= 0 || !editExpiryDate) {
-            alert("Vui lòng nhập đầy đủ thông tin hợp lệ.");
-            return;
-        }
-        onUpdate({id: editId!, code: editCode.trim(), percent: editDiscount, endDate: editExpiryDate});
+        if (editId == null) return;
+        const updated: Discount = {
+            id: editId,
+            code: editCode,
+            percent: editDiscount,
+            startDate: editStartDate,
+            endDate: editExpiryDate,
+        };
+        onUpdate(updated);
         setEditId(null);
     };
 
@@ -42,28 +46,37 @@ function CouponList({coupons, onDelete, onUpdate}: CouponListProps) {
                     <th className="border border-gray-300 p-2">ID</th>
                     <th className="border border-gray-300 p-2">Mã</th>
                     <th className="border border-gray-300 p-2">Giảm (%)</th>
+                    <th className="border border-gray-300 p-2">Ngày bắt đầu</th>
                     <th className="border border-gray-300 p-2">Hạn dùng</th>
                     <th className="border border-gray-300 p-2">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody>
-                {coupons.map(({id, code, percent, endDate}) => (
-                    <tr key={id} className="border-t border-gray-300">
-                        <td className="border border-gray-300 p-2 text-center">{id}</td>
+                {coupons.length === 0 && (
+                    <tr>
+                        <td colSpan={6} className="text-center p-4 text-gray-500">
+                            Chưa có mã giảm giá nào
+                        </td>
+                    </tr>
+                )}
+                {coupons.map((coupon) => (
+                    <tr key={coupon.id} className="border-t border-gray-300">
+                        <td className="border border-gray-300 p-2 text-center">{coupon.id}</td>
                         <td className="border border-gray-300 p-2 text-center">
-                            {editId === id ? (
+                            {editId === coupon.id ? (
                                 <input
                                     type="text"
                                     value={editCode}
                                     onChange={(e) => setEditCode(e.target.value.toUpperCase())}
                                     className="border p-1 rounded w-full"
+                                    readOnly
                                 />
                             ) : (
-                                code
+                                coupon.code
                             )}
                         </td>
                         <td className="border border-gray-300 p-2 text-center">
-                            {editId === id ? (
+                            {editId === coupon.id ? (
                                 <input
                                     type="number"
                                     value={editDiscount}
@@ -73,11 +86,23 @@ function CouponList({coupons, onDelete, onUpdate}: CouponListProps) {
                                     max={100}
                                 />
                             ) : (
-                                percent
+                                coupon.percent
                             )}
                         </td>
                         <td className="border border-gray-300 p-2 text-center">
-                            {editId === id ? (
+                            {editId === coupon.id ? (
+                                <input
+                                    type="date"
+                                    value={editStartDate}
+                                    onChange={(e) => setEditStartDate(e.target.value)}
+                                    className="border p-1 rounded w-full"
+                                />
+                            ) : (
+                                coupon.startDate
+                            )}
+                        </td>
+                        <td className="border border-gray-300 p-2 text-center">
+                            {editId === coupon.id ? (
                                 <input
                                     type="date"
                                     value={editExpiryDate}
@@ -85,11 +110,11 @@ function CouponList({coupons, onDelete, onUpdate}: CouponListProps) {
                                     className="border p-1 rounded w-full"
                                 />
                             ) : (
-                                endDate
+                                coupon.endDate
                             )}
                         </td>
                         <td className="border border-gray-300 p-2 text-center space-x-2">
-                            {editId === id ? (
+                            {editId === coupon.id ? (
                                 <>
                                     <button
                                         onClick={saveEdit}
@@ -107,13 +132,13 @@ function CouponList({coupons, onDelete, onUpdate}: CouponListProps) {
                             ) : (
                                 <>
                                     <button
-                                        onClick={() => startEditing({id, code, percent, endDate})}
+                                        onClick={() => startEditing(coupon)}
                                         className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                                     >
                                         Sửa
                                     </button>
                                     <button
-                                        onClick={() => onDelete(id)}
+                                        onClick={() => onDelete(coupon.code!)}
                                         className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
                                     >
                                         Xóa
@@ -123,14 +148,6 @@ function CouponList({coupons, onDelete, onUpdate}: CouponListProps) {
                         </td>
                     </tr>
                 ))}
-
-                {coupons.length === 0 && (
-                    <tr>
-                        <td colSpan={5} className="text-center p-4 text-gray-500">
-                            Chưa có mã giảm giá nào
-                        </td>
-                    </tr>
-                )}
                 </tbody>
             </table>
         </div>

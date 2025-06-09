@@ -1,70 +1,67 @@
+import React, {useState} from "react";
+import {Customer} from "../../../models/Customer";
+import {useAdmin} from "../../../hooks/useAdmin";
+import {CustomerResponse} from "../../../models/response/CustomerResponse";
+import {CustomerRequest} from "../../../models/request/CustomerRequest";
 import Header from "../../../components/Header";
 import Sidebar from "../dasboard/Sidebar";
-import Footer from "../../../components/Footer";
-import React, {useState} from "react";
 import UserForm from "./component/UserForm";
 import UserTable from "./component/UserTable";
-import {CustomerResponse} from "../../../models/response/CustomerResponse";
-import {Customer} from "../../../models/Customer";
-
+import Footer from "../../../components/Footer";
+import Notification from "../../../components/Notification";
 
 function ManageUser() {
-    const [users, setUsers] = useState<CustomerResponse[]>([
-        {
-            id: "1",
-            fullname: "Nguyễn Văn A",
-            email: "a@gmail.com",
-            role: "admin",
-            phone: "0348429274",
-            username: "a",
-            password: "44556"
-        },
-        {
-            id: "2",
-            fullname: "Trần Thị B",
-            email: "b@gmail.com",
-            role: "user",
-            phone: "0348429274",
-            username: "a",
-            password: "44556"
-        },
-    ]);
+    const { userAll, setUserAll, handleAddCustomer, handleUpdateCustomer, notification, setNotification, handleDeleteCustomer } = useAdmin();
     const [editingUser, setEditingUser] = useState<Customer | null>(null);
 
     const handleDelete = (id: string) => {
-        setUsers(prev => prev.filter(user => user.id !== id));
+        setUserAll(prev => prev.filter(user => user.id !== id));
     };
 
     const handleEdit = (user: CustomerResponse) => {
-        setEditingUser(user );
+        setEditingUser(user);
     };
 
-    const handleSubmit = (user: Customer) => {
-        if (!user.id) {
-            const newUser = {...user, id: Date.now().toString()};
-            setUsers(prev => [...prev, newUser]);
+    const handleSubmit = async (customerRequest: CustomerRequest) => {
+        if (editingUser && editingUser.id) {
+            console.log("Dữ liệu gửi lên để cập nhật:", customerRequest);
+
+            // Cập nhật user
+            const updated = await handleUpdateCustomer(editingUser.id, customerRequest);
+            if (updated) {
+                setEditingUser(null);
+            }
         } else {
-            setUsers(prev =>
-                prev.map(u => (u.id === user.id ? user : u))
-            );
+            // Thêm user mới
+            await handleAddCustomer(customerRequest);
         }
+    };
+
+    const handleCancelEdit = () => {
         setEditingUser(null);
     };
 
     return (
         <>
-            <Header/>
+            <Header />
             <div className="flex min-h-screen bg-gray-100">
-                <Sidebar/>
+                {notification && (
+                    <Notification message={notification.message} type={notification.type}
+                                  onClose={() => setNotification(null)}/>
+                )}
+                <Sidebar />
                 <main className="flex-1 p-6">
                     <h1 className="text-xl font-bold mb-4">Quản lý người dùng</h1>
-                    <UserForm user={editingUser} onSubmit={handleSubmit}/>
-                    <UserTable users={users} onDelete={handleDelete} onEdit={handleEdit}/>
+                    <UserForm
+                        user={editingUser}
+                        onSubmit={handleSubmit}
+                        onCancel={handleCancelEdit}
+                    />
+                    <UserTable users={userAll} onDelete={handleDeleteCustomer} onEdit={handleEdit} />
                 </main>
             </div>
-            <Footer/>
+            <Footer />
         </>
     );
 }
-
 export default ManageUser;

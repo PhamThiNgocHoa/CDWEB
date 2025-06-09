@@ -1,153 +1,107 @@
-import {useRef, useState} from "react";
-import {Category} from "../../../models/Category";
+import React, {useRef, useState} from "react";
 import Header from "../../../components/Header";
 import Sidebar from "../dasboard/Sidebar";
-import ExcelUpload from "./component/ExcelUpload";
 import CategoryForm from "./component/CategoryForm";
 import CategoryList from "./component/CategoryList";
 import Footer from "../../../components/Footer";
+import useCategory from "../../../hooks/useCategory";
+import {useAdmin} from "../../../hooks/useAdmin";
+import Notification from "../../../components/Notification";
+import {deleteCategory} from "../../../server/api/admin/admin.delete";
+import {importCategoryExcel} from "../../../server/api/admin/admin.post";
 
 function ManageCategories() {
-    const [categories, setCategories] = useState<Category[]>([
-        {
-            id: 1,
-            name: "Điện thoại",
-            img: "https://nhasachphuongnam.com/images/detailed/244/hieu-ve-trai-tim-tb-2023.jpg",
-        },
-        {
-            id: 2,
-            name: "Laptop",
-            img: "https://nhasachphuongnam.com/images/detailed/244/hieu-ve-trai-tim-tb-2023.jpg",
-        },
-        {
-            id: 3,
-            name: "Phụ kiện",
-            img: "https://nhasachphuongnam.com/images/detailed/244/hieu-ve-trai-tim-tb-2023.jpg",
-        },
-    ]);
+    const {handleAddCategory} = useAdmin();
+    const {categories, setCategories, refreshCategories} = useCategory();
 
-    // Thêm category mới
+
     const [newCategoryName, setNewCategoryName] = useState("");
-    const [newCategoryImg, setNewCategoryImg] = useState("");
-
-    // Sửa category
-    const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
-    const [editCategoryName, setEditCategoryName] = useState("");
-    const [editCategoryImg, setEditCategoryImg] = useState("");
+    const [newCategoryDescription, setNewCategoryDescription] = useState("");
+    const [newCode, setNewCode] = useState("");
+    const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
     const newFileInputRef = useRef<HTMLInputElement>(null);
-    const excelFileInputRef = useRef<HTMLInputElement>(null);
 
-    // Convert file thành base64 string
-    const fileToBase64 = (file: File): Promise<string> =>
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === "string") resolve(reader.result);
-                else reject("FileReader result is not string");
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
+    const handleSubmit = async () => {
+        try {
+            const newCategory = await handleAddCategory({
+                name: newCategoryName,
+                description: newCategoryDescription,
+                code: newCode,
+            });
 
-    // Xử lý upload ảnh cho thêm mới
-    const handleNewImgChange = async (file: File | null) => {
-        if (file) {
-            const base64 = await fileToBase64(file);
-            setNewCategoryImg(base64);
-        } else {
-            setNewCategoryImg("");
+            setCategories([...categories, newCategory]);
+
+            setNewCategoryName("");
+            setNewCategoryDescription("");
+            setNewCode("");
+
+            setNotification({message: "Thêm danh mục thành công", type: "success"});
+        } catch (error) {
+            setNotification({message: "Thêm danh mục thất bại", type: "error"});
         }
     };
 
-    // Xử lý upload ảnh khi sửa
-    const handleEditImgChange = async (file: File | null) => {
-        if (file) {
-            const base64 = await fileToBase64(file);
-            setEditCategoryImg(base64);
+    const handleImportExcel = async (file: File) => {
+        try {
+            await importCategoryExcel(file);
+            await refreshCategories();
+            setNotification({message: "Import danh mục thành công", type: "success"});
+        } catch (error) {
+            setNotification({message: "Import danh mục thất bại", type: "error"});
         }
     };
 
-    const handleAddCategory = () => {
-        if (!newCategoryName.trim()) return;
-        const newId = categories.length ? categories[categories.length - 1].id + 1 : 1;
-        setCategories([
-            ...categories,
-            {id: newId, name: newCategoryName, img: newCategoryImg || "https://via.placeholder.com/80"},
-        ]);
-        setNewCategoryName("");
-        setNewCategoryImg("");
-        if (newFileInputRef.current) newFileInputRef.current.value = "";
-    };
 
-    const startEditing = (id: number, name: string, img: string) => {
-        setEditCategoryId(id);
-        setEditCategoryName(name);
-        setEditCategoryImg(img);
-    };
-
-    const saveEdit = () => {
-        if (!editCategoryName.trim() || editCategoryId === null) return;
+    const saveEdit = (id: string, name: string, description: string, code: string) => {
         setCategories(
             categories.map((cat) =>
-                cat.id === editCategoryId
-                    ? {...cat, name: editCategoryName, img: editCategoryImg || "https://via.placeholder.com/80"}
+                cat.id === id
+                    ? {...cat, name, description, code}
                     : cat
             )
         );
-        setEditCategoryId(null);
-        setEditCategoryName("");
-        setEditCategoryImg("");
+        setNotification({message: "Cập nhật danh mục thành công", type: "success"});
     };
 
-    const cancelEdit = () => {
-        setEditCategoryId(null);
-        setEditCategoryName("");
-        setEditCategoryImg("");
-    };
-
-    const deleteCategory = (id: number) => {
-        if (window.confirm("Bạn có chắc muốn xóa danh mục này?")) {
+    const handleDeleteCategory = async (id: string) => {
+        try {
+            await deleteCategory(id);
             setCategories(categories.filter((cat) => cat.id !== id));
+            setNotification({message: "Xóa danh mục thành công", type: "success"});
+        } catch (error) {
+            setNotification({message: "Xóa danh mục thất bại, thử lại sau", type: "error"});
+            console.error("Delete category failed:", error);
         }
     };
 
-    const handleExcelFileUpload = (file: File | null) => {
-        if (file) {
-            alert(`Bạn vừa upload file: ${file.name}. Xử lý import danh mục từ file Excel ở đây.`);
-            // TODO: xử lý đọc file Excel và thêm danh mục
-        }
-    };
 
     return (
         <>
             <div>
                 <Header/>
                 <div className="flex min-h-screen bg-gray-100">
+                    {notification && (
+                        <Notification message={notification.message} type={notification.type}
+                                      onClose={() => setNotification(null)}/>
+                    )}
                     <Sidebar/>
                     <main className="flex-1 p-6 space-y-6">
-                        <ExcelUpload onFileUpload={handleExcelFileUpload} fileInputRef={excelFileInputRef}/>
-
                         <CategoryForm
                             newCategoryName={newCategoryName}
-                            newCategoryImg={newCategoryImg}
                             onNameChange={setNewCategoryName}
-                            onImgChange={handleNewImgChange}
-                            onAdd={handleAddCategory}
+                            newcode={newCode}
+                            onCode={setNewCode}
+                            onAdd={handleSubmit}
                             fileInputRef={newFileInputRef}
-                        />
+                            newCategoryDescription={newCategoryDescription}
+                            onDescriptionChange={setNewCategoryDescription}
+                            onImportExcel={handleImportExcel}/>
 
                         <CategoryList
                             categories={categories}
-                            editCategoryId={editCategoryId}
-                            editCategoryName={editCategoryName}
-                            editCategoryImg={editCategoryImg}
-                            onStartEdit={startEditing}
-                            onChangeEditName={setEditCategoryName}
-                            onChangeEditImg={handleEditImgChange}
                             onSaveEdit={saveEdit}
-                            onCancelEdit={cancelEdit}
-                            onDelete={deleteCategory}
+                            onDelete={handleDeleteCategory}
                         />
                     </main>
                 </div>

@@ -1,15 +1,17 @@
 import axios from "axios";
 
 class ApiService {
-    private static getAuthHeaders() {
+    private static getAuthHeaders(body?: any) {
         const token = localStorage.getItem("authToken");
 
-        const headers: any = {
-            "Content-Type": "application/json",
-        };
+        const headers: any = {};
 
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        if (!(body instanceof FormData)) {
+            headers["Content-Type"] = "application/json";
         }
 
         return headers;
@@ -25,8 +27,10 @@ class ApiService {
     ): Promise<any> {
         try {
             const combinedHeaders = requireAuth
-                ? {...ApiService.getAuthHeaders(), ...headers}
-                : {"Content-Type": "application/json", ...headers};
+                ? {...ApiService.getAuthHeaders(body), ...headers}
+                : (!(body instanceof FormData)
+                    ? {"Content-Type": "application/json", ...headers}
+                    : {...headers});
 
             const axiosConfig: any = {
                 url,
