@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { OrderDetailRequest } from "../models/request/OrderDetailRequest";
-import { OrderMethod } from "../enums/OrderMethod";
-import { createOrder } from "../server/api/order/order.post";
-import { createPayment } from "../server/api/payment/payment.post";
-import { getOrderByCustomerId } from "../server/api/order/order.get";
-import { OrderResponse } from "../models/response/OrderResponse";
+import {useCallback, useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {OrderDetailRequest} from "../models/request/OrderDetailRequest";
+import {OrderMethod} from "../enums/OrderMethod";
+import {createOrder} from "../server/api/order/order.post";
+import {createPayment} from "../server/api/payment/payment.post";
+import {getOrderByCustomerId} from "../server/api/order/order.get";
+import {OrderResponse} from "../models/response/OrderResponse";
 import useCustomer from "./useCustomer";
-import { OrderStatus } from "../enums/OrderStatus";
-import { changeOrderStatus } from "../server/api/order/order.put";
-import { useToken } from "./useToken"; // ✅ dùng useToken thay vì useAuth
+import {OrderStatus} from "../enums/OrderStatus";
+import {changeOrderStatus} from "../server/api/order/order.delete";
+import {useToken} from "./useToken"; // ✅ dùng useToken thay vì useAuth
 
 const useOrder = () => {
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ const useOrder = () => {
     const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { user } = useCustomer();
+    const {user} = useCustomer();
     const token = useToken();
 
     const fetchCreateOrderAndPayment = useCallback(
@@ -47,7 +47,7 @@ const useOrder = () => {
                 setOrderId(orderResponse);
 
                 if (method === OrderMethod.VN_PAY) {
-                    const returnUrl = `${window.location.origin}/payment-return`;
+                    const returnUrl = "https://fahabook-be-production.up.railway.app/api/payments/vnpay-return"; // ✅ Không dùng localhost
                     const paymentUrl = await createPayment(orderResponse ?? "", returnUrl);
 
                     if (paymentUrl) {
@@ -104,16 +104,25 @@ const useOrder = () => {
 
         try {
             if (status === OrderStatus.PENDING || status === OrderStatus.PENDING_PAYMENT) {
-                await changeOrderStatus(OrderStatus.CANCELLED, orderId);
+                await changeOrderStatus(orderId);
+                setOrders((prevOrders) =>
+                    prevOrders?.map((o) =>
+                        o.id === orderId ? { ...o, status: OrderStatus.CANCELLED } : o
+                    )
+                );
+
                 setNotification({ message: "Đơn hàng đã bị hủy thành công!", type: "success" });
             } else {
                 setNotification({ message: "Không thể hủy đơn hàng đã xử lý hoặc đã giao!", type: "error" });
             }
         } catch (error) {
+            console.error("Lỗi khi hủy đơn hàng:", error);
             setNotification({ message: "Lỗi khi hủy đơn hàng!", type: "error" });
             setError("Không thể hủy đơn hàng");
         }
     };
+
+
 
     const handleViewDetail = (orderId: string) => {
         navigate(`/orderDetail/${orderId}`);

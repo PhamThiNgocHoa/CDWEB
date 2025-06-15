@@ -13,13 +13,16 @@ function ManageCoupons() {
     return (
         <div>
             <Header/>
-            <div className="flex min-h-screen bg-gray-100">
+            <div className="flex min-h-screen bg-gray-100 mt-32">
                 {notification && (
                     <Notification message={notification.message} type={notification.type}
                                   onClose={() => setNotification(null)}/>
                 )}
-                <Sidebar/>
-                <main className="flex-1 p-6 space-y-6">
+                <div
+                    className="w-64 hidden md:block fixed top-[80px] left-0 h-[calc(100vh-80px)] overflow-y-auto z-40 bg-white shadow-lg">
+                    <Sidebar/>
+                </div>
+                <main className="flex-1 ml-0 md:ml-64 p-6 pt-[100px] py-16">
                     <CouponForm onAdd={handleAddDiscount}/>
                     <CouponList coupons={coupons} onDelete={handleDelete} onUpdate={saveEdit}/>
                 </main>

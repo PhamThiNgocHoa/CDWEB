@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Category} from "../../../../models/Category";
-import {useAdmin} from "../../../../hooks/useAdmin";
 import useCategory from "../../../../hooks/useCategory";
+import {useCategoryManagement} from "../../../../hooks/useCategoryManagement";
 
 type CategoryRowProps = {
     category: Category;
@@ -14,11 +14,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({category, onDelete, onSaveEdit
     const [editName, setEditName] = useState<string>(category.name);
     const [editDescription, setEditDescription] = useState<string>(category.description ?? "");
     const [editCode, setEditCode] = useState<string>(category.code ?? "");
-    const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const {handleUpdateCategory} = useAdmin();
+    const {handleUpdateCategory} = useCategoryManagement();
 
     const handleOpenModal = () => {
         setEditName(category.name);

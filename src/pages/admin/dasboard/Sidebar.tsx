@@ -26,7 +26,7 @@ function Sidebar() {
 
             <aside
                 className={`
-                    bg-white shadow-lg p-4 h-full
+                    bg-white shadow-lg p-4 mt-7
                     fixed top-0 left-0 z-50 
                     transform transition-transform duration-300
                     ${isOpen ? 'translate-x-0' : '-translate-x-full'} 

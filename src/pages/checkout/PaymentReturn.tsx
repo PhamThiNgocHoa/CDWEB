@@ -6,9 +6,7 @@ const VNPayReturnPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const queryParams = Object.fromEntries(new URLSearchParams(window.location.search));
-
-        vnpayReturnHandlerGet(queryParams)
+        vnpayReturnHandlerGet()
             .then((responseMessage) => {
                 if (responseMessage === "Payment success") {
                     navigate("/");

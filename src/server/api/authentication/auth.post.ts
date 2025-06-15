@@ -67,7 +67,7 @@ export const checkTokenExpiration = async (token: string | null): Promise<number
         return 401;
     }
     try {
-        const response = await ApiService.post(`/api/auth/checkTokenExpiration/${token}`, {}, {}, false);
+        const response = await ApiService.post(`/api/auth/checkTokenExpiration/${token}`, {}, {}, true);
         return response.code;
     } catch (error: any) {
         console.error("checkTokenExpiration failed", error);
@@ -85,6 +85,13 @@ export const checkEmail = async (email: string): Promise<boolean> => {
     const res = await ApiService.post("/api/auth/check-email", email, {"Content-Type": "text/plain"}, false);
     return res.data === true;
 };
+export const loginWithGoogle = () => {
+    window.location.href = "http://localhost:8080/api/auth/login-google";
+};
+
+
+
+
 
 
 

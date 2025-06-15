@@ -52,7 +52,7 @@ const Cart = () => {
 
             const cartItemRequest: CartItemRequest = {
                 cartId: itemToUpdate.id,
-                productId: itemToUpdate.product.id,
+                productId: itemToUpdate.product.id ?? "",
                 quantity: newQuantity,
             };
 

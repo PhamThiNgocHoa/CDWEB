@@ -1,5 +1,4 @@
 import {BookForm} from "../../enums/BookForm";
-import {Category} from "../Category";
 
 export interface ProductResponse {
     id: string;
@@ -20,6 +19,6 @@ export interface ProductResponse {
     categoryName?: string;
     discount?: number;
     stock?: number;
-
+    code: string;
 
 }

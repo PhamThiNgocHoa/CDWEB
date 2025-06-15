@@ -94,7 +94,10 @@ const ProductDetail = () => {
             return;
         }
         if (!product) return;
-
+        if (!product.stock || product.stock < 1) {
+            showErrNotification("Sản phẩm đã hết hàng.");
+            return;
+        }
         try {
             const user = await getUser();
             if (!user.cartId) {

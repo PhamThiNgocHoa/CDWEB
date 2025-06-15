@@ -17,36 +17,66 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
         email: "",
     });
 
+    const [initialForm, setInitialForm] = useState<CustomerRequest>({
+        fullname: "",
+        password: "",
+        phone: "",
+        username: "",
+        email: "",
+    });
+
     useEffect(() => {
         if (user) {
-            setForm({
+            const initial = {
                 fullname: user.fullname,
                 email: user.email,
                 phone: user.phone,
                 username: user.username,
                 password: user.password,
-            });
+            };
+            setForm(initial);
+            setInitialForm(initial); // lưu bản gốc để so sánh khi submit
         } else {
-            setForm({
+            const emptyForm = {
                 fullname: "",
                 password: "",
                 phone: "",
                 username: "",
                 email: "",
-            });
+            };
+            setForm(emptyForm);
+            setInitialForm(emptyForm);
         }
     }, [user]);
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(form);
+
+        if (!user) {
+            // Thêm mới → gửi toàn bộ form
+            onSubmit(form);
+        } else {
+            // Chỉ gửi các trường thay đổi
+            const changedFields: Partial<CustomerRequest> = {};
+
+            for (const key in form) {
+                const k = key as keyof CustomerRequest;
+                if (form[k] !== initialForm[k]) {
+                    changedFields[k] = form[k];
+                }
+            }
+
+            if (Object.keys(changedFields).length > 0) {
+                onSubmit({ ...user, ...changedFields });
+            } else {
+                alert("Không có thay đổi nào để cập nhật.");
+            }
+        }
     };
 
     const handleCancel = () => {

@@ -2,6 +2,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import useCustomer from "../hooks/useCustomer";
 import Notification from "../components/Notification";
+import {loginWithGoogle} from "../server/api/authentication/auth.post";
 
 function Login() {
 
@@ -63,6 +64,7 @@ function Login() {
                         </form>
                         <button
                             type="submit"
+                            onClick={loginWithGoogle}
                             className="w-full border-2 py-3 my-2 rounded-md hover:bg-red-200 focus:outline-none"
                         >
                             Đăng nhập bằng Google

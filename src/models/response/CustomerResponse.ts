@@ -4,7 +4,8 @@ export interface CustomerResponse {
     email: string;
     phone: string;
     username: string;
-    password: string
+    password: string;
+    status?: string;
     role?: string;
     cartId?: string;
 }

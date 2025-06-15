@@ -1,8 +1,9 @@
 import ApiService from "../ApiService";
 
-export const vnpayReturnHandlerGet = async (params: any) => {
+export const vnpayReturnHandlerGet = async () => {
     try {
-        const response = await ApiService.get("/api/payments/vnpay-return", params, {}, true);
+        const queryString = window.location.search; // Lấy ?vnp_TxnRef=...&vnp_...
+        const response = await ApiService.get(`/api/payments/vnpay-return${queryString}`, {}, {}, true);
 
         if (response) {
             return response;

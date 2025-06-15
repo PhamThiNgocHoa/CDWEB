@@ -1,34 +1,54 @@
-import React, { useState } from "react";
-import { OrderResponse } from "../../../../models/response/OrderResponse";
+import React, {useState} from "react";
+import {OrderResponse} from "../../../../models/response/OrderResponse";
+import {OrderStatusDisplayName} from "../../../../enums/OrderStatus";
 
 interface OrderListProps {
     orders: OrderResponse[];
     onDelete: (id: string) => void;
     onEdit: (order: OrderResponse) => void;
+    onView: (order: OrderResponse) => void;
 }
 
-const OrderList: React.FC<OrderListProps> = ({ orders, onDelete, onEdit }) => {
-    const [searchTerm, setSearchTerm] = useState("");
 
-    // Lọc orders theo searchTerm
-    const filteredOrders = orders.filter(
-        (order) =>
+const OrderList: React.FC<OrderListProps> = ({orders, onDelete, onEdit, onView}) => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [status, setStatus] = useState("");
+
+
+    const filteredOrders = orders.filter((order) => {
+        const matchesSearch =
             order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customerDTO.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+            order.customerDTO.fullname.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesStatus = status === "" || order.status === status;
+
+        return matchesSearch && matchesStatus;
+    });
+
 
     return (
         <div>
-            {/* Input tìm kiếm */}
-            <input
-                type="text"
-                placeholder="Tìm kiếm theo mã đơn hoặc khách hàng..."
-                className="mb-4 w-full p-2 border border-gray-300 rounded"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex gap-4 mb-4">
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm theo mã đơn hoặc khách hàng..."
+                    className="w-full p-2 border border-gray-300 rounded"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <select
+                    className="p-2 border border-gray-300 rounded"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                >
+                    <option value="">Tất cả trạng thái</option>
+                    {Object.entries(OrderStatusDisplayName).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                    ))}
+                </select>
+            </div>
 
-            {/* Bảng đơn hàng */}
+
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
                 <thead>
                 <tr className="bg-red-600 text-white uppercase text-sm font-semibold">
@@ -50,44 +70,60 @@ const OrderList: React.FC<OrderListProps> = ({ orders, onDelete, onEdit }) => {
                             }`}
                         >
                             <td className="py-4 px-6 text-left font-medium text-gray-700">{order.id}</td>
-                            <td className="py-4 px-6 text-left">{order.customerDTO.fullname}</td>
+                            <td className="py-4 px-6 text-left">{order.receiver}</td>
                             <td className="py-4 px-6 text-right font-semibold text-green-600">
                                 {order.totalAmount.toLocaleString()}đ
                             </td>
                             <td className="py-4 px-6 text-center">
-                  <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                          order.status === "PENDING"
-                              ? "bg-yellow-200 text-yellow-800"
-                              : order.status === "DELIVERED"
-                                  ? "bg-green-200 text-green-800"
-                                  : "bg-gray-200 text-gray-800"
-                      }`}
-                  >
-                    {order.status}
-                  </span>
+                               <span
+                                   className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                                       order.status === "PENDING_PAYMENT"
+                                           ? "bg-orange-200 text-orange-800"
+                                           : order.status === "PENDING"
+                                               ? "bg-yellow-200 text-yellow-800"
+                                               : order.status === "PAYMENT_FAILED"
+                                                   ? "bg-red-200 text-red-800"
+                                                   : order.status === "PAYMENT_SUCCESS"
+                                                       ? "bg-blue-200 text-blue-800"
+                                                       : order.status === "SHIPPING"
+                                                           ? "bg-purple-200 text-purple-800"
+                                                           : order.status === "DELIVERED"
+                                                               ? "bg-green-200 text-green-800"
+                                                               : order.status === "CANCELLED"
+                                                                   ? "bg-red-200 text-red-800"
+                                                                   : "bg-gray-100 text-gray-600"
+                                   }`}
+                               >
+                                  {OrderStatusDisplayName[order.status]}
+                                </span>
+
+
                             </td>
                             <td className="py-4 px-6 text-center">
                                 {new Date(order.orderDate).toLocaleDateString()}
                             </td>
-                            <td className="py-4 px-6 text-center">
+                            <td className="py-4 px-6 text-center space-x-2">
+                                <button
+                                    onClick={() => onView(order)}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded transition"
+                                    title="Xem chi tiết"
+                                >
+                                    👁
+                                </button>
                                 <button
                                     onClick={() => onEdit(order)}
-                                    className="mr-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
                                 >
                                     Sửa
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        if (window.confirm("Bạn có chắc muốn xóa đơn hàng này?")) {
-                                            onDelete(order.id);
-                                        }
-                                    }}
+                                    onClick={() => onDelete(order.id)}
                                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition"
                                 >
                                     Xóa
                                 </button>
                             </td>
+
                         </tr>
                     ))
                 ) : (

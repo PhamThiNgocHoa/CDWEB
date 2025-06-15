@@ -18,15 +18,13 @@ function OrderDetail() {
     const currentOrder = orders?.find(order => order.id === orderId);
     const {token} = useAuth();
 
-    if (!token || token.trim() === "" || token === "null") {
-        setError("Không có token đăng nhập");
-    }
     useEffect(() => {
         const fetchGetOrderById = async () => {
-            if (!token) {
+            if (!token || token.trim() === "" || token === "null") {
                 setError("Không có token đăng nhập");
                 return;
             }
+
             setLoading(true);
             setError(null);
             try {
@@ -34,10 +32,14 @@ function OrderDetail() {
                 setOrderDetail(data);
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+                setError("Không thể lấy dữ liệu đơn hàng");
+            } finally {
+                setLoading(false);
             }
         };
+
         fetchGetOrderById();
-    }, [orderId]);
+    }, [orderId, token]);
 
     return (
         <>
