@@ -12,5 +12,4 @@ const OrderStats = () => {
         </div>
     );
 };
-
 export default OrderStats;

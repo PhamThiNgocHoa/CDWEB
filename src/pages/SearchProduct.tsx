@@ -7,10 +7,12 @@ import useProduct from "../hooks/useProduct";
 import {ProductResponse} from "../models/response/ProductResponse";
 import useCategory from "../hooks/useCategory";
 import {BookForm, BookFormDisplayName} from "../enums/BookForm";
+import {getListProduct} from "../server/api/product/product.get";
 
 const SearchProduct = () => {
     const {name} = useParams();
-    const [products, setProducts] = useState<ProductResponse[]>([]);
+    // const [products, setProducts] = useState<ProductResponse[]>([]);
+    const {products, setProducts} =useProduct();
     const [filteredProducts, setFilteredProducts] = useState<ProductResponse[]>([]);
     const [priceRange, setPriceRange] = useState<string>("");
     const {fetchListFindByName} = useProduct();
@@ -21,12 +23,13 @@ const SearchProduct = () => {
 
     useEffect(() => {
         const search = async () => {
-            if (name) {
+            if (name && name.trim() !== "") {
                 const result = await fetchListFindByName(decodeURIComponent(name));
                 setProducts(result);
                 setFilteredProducts(result);
             } else {
-                setProducts([]);
+                const all = await getListProduct();
+                setProducts(all);
                 setFilteredProducts([]);
             }
         };
@@ -73,7 +76,6 @@ const SearchProduct = () => {
         setPriceRange(value);
     };
 
-    // Hàm reset filter
     const clearFilters = () => {
         setCategoryId(undefined);
         setForm(undefined);
@@ -127,7 +129,6 @@ const SearchProduct = () => {
                                     </select>
                                 </div>
 
-                                {/* Khoảng giá */}
                                 <div className="mb-6">
                                     <h3 className="font-medium text-lg mb-2">Lọc theo giá</h3>
                                     <div className="flex flex-col mb-4">
@@ -150,7 +151,6 @@ const SearchProduct = () => {
                                     </div>
                                 </div>
 
-                                {/* Nút xóa bộ lọc */}
                                 <button
                                     onClick={clearFilters}
                                     className="mt-4 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
@@ -159,7 +159,6 @@ const SearchProduct = () => {
                                 </button>
                             </div>
 
-                            {/* Kết quả sản phẩm */}
                             <div className="col-span-3">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                     {filteredProducts.length > 0 ? (
@@ -170,6 +169,7 @@ const SearchProduct = () => {
                                                 name={product.name}
                                                 img={product.img}
                                                 price={product.price}
+                                                discount={product.discount}
                                                 quantitySold={10}
                                                 onClick={() => handleProductClick(product.id)}
                                             />

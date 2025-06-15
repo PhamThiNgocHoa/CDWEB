@@ -9,7 +9,6 @@ interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) => {
     useEffect(() => {
-        // Tự động đóng thông báo sau 3 giây
         const timer = setTimeout(() => {
             onClose();
         }, 3000);
@@ -20,13 +19,14 @@ const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) =
 
     return (
         <div
-            className={`fixed top-5 right-5 px-4 py-2 rounded-lg text-white ${
+            className={`fixed mt-4 left-1/2 transform -translate-x-1/2 z-[9999] px-4 py-2 rounded-lg text-white shadow-lg ${
                 type === "success" ? "bg-green-500" : "bg-red-500"
             }`}
         >
             <p>{message}</p>
         </div>
     );
+
 };
 
 export default Notification;

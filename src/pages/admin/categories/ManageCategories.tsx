@@ -5,13 +5,14 @@ import CategoryForm from "./component/CategoryForm";
 import CategoryList from "./component/CategoryList";
 import Footer from "../../../components/Footer";
 import useCategory from "../../../hooks/useCategory";
-import {useAdmin} from "../../../hooks/useAdmin";
 import Notification from "../../../components/Notification";
 import {deleteCategory} from "../../../server/api/admin/admin.delete";
 import {importCategoryExcel} from "../../../server/api/admin/admin.post";
 
+import {useCategoryManagement} from "../../../hooks/useCategoryManagement";
+
 function ManageCategories() {
-    const {handleAddCategory} = useAdmin();
+    const {handleAddCategory} = useCategoryManagement();
     const {categories, setCategories, refreshCategories} = useCategory();
 
 
@@ -25,18 +26,20 @@ function ManageCategories() {
     const handleSubmit = async () => {
         try {
             const newCategory = await handleAddCategory({
-                name: newCategoryName,
-                description: newCategoryDescription,
-                code: newCode,
+                name: newCategoryName.trim(),
+                description: newCategoryDescription.trim(),
+                code: newCode.trim(),
             });
 
-            setCategories([...categories, newCategory]);
-
-            setNewCategoryName("");
-            setNewCategoryDescription("");
-            setNewCode("");
-
-            setNotification({message: "Thêm danh mục thành công", type: "success"});
+            if (newCategory) {
+                await refreshCategories();
+                setNewCategoryName("");
+                setNewCategoryDescription("");
+                setNewCode("");
+                setNotification({message: "Thêm danh mục thành công", type: "success"});
+            } else {
+                setNotification({message: "Thêm danh mục thất bại", type: "error"});
+            }
         } catch (error) {
             setNotification({message: "Thêm danh mục thất bại", type: "error"});
         }
@@ -80,13 +83,16 @@ function ManageCategories() {
         <>
             <div>
                 <Header/>
-                <div className="flex min-h-screen bg-gray-100">
+                <div className="flex min-h-screen bg-gray-100 mt-36">
                     {notification && (
                         <Notification message={notification.message} type={notification.type}
                                       onClose={() => setNotification(null)}/>
                     )}
-                    <Sidebar/>
-                    <main className="flex-1 p-6 space-y-6">
+                    <div
+                        className="w-64 hidden md:block fixed top-[80px] left-0 h-[calc(100vh-80px)] overflow-y-auto z-40 bg-white shadow-lg">
+                        <Sidebar/>
+                    </div>
+                    <main className="flex-1 ml-0 md:ml-64 p-6 pt-[100px]">
                         <CategoryForm
                             newCategoryName={newCategoryName}
                             onNameChange={setNewCategoryName}

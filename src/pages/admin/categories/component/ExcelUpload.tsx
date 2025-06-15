@@ -8,7 +8,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onFileUpload, fileInputRef, d
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         onFileUpload(file);
-        e.target.value = ""; // reset input để có thể chọn lại file cũ
+        e.target.value = "";
     };
 
     return (

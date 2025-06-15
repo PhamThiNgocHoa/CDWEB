@@ -1,16 +1,13 @@
-import {useCallback, useEffect, useState} from "react";
-import {Product} from "../models/Product";
+import { useEffect, useRef, useState } from "react";
 import {
-    filterProduct,
     getListProduct,
     getProductById,
     getProductSale,
     listFindByName,
     searchProduct
 } from "../server/api/product/product.get";
-import {BookForm} from "../enums/BookForm";
-import {ProductResponse} from "../models/response/ProductResponse";
-import useCustomer from "./useCustomer";
+import { BookForm } from "../enums/BookForm";
+import { ProductResponse } from "../models/response/ProductResponse";
 
 type FilterParams = {
     name?: string;
@@ -22,42 +19,43 @@ type FilterParams = {
 
 function useProduct() {
     const [products, setProducts] = useState<ProductResponse[]>([]);
+    const [saleProducts, setSaleProducts] = useState<ProductResponse[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [saleProducts, setSaleProducts] = useState<ProductResponse[]>([]);
     const [params, setParams] = useState<FilterParams>({});
-    const {user} = useCustomer();
+    const hasFetched = useRef<boolean>(false); // Dùng useRef để ngăn gọi nhiều lần
 
     const handleError = (error: unknown) => {
         const message = error instanceof Error ? error.message : "Unknown error occurred";
         setError(message);
-        throw new Error(message);
+        console.error("useProduct error:", message);
+        // ❌ Không throw nữa
     };
 
-    // Chỉ gọi 1 lần khi load để lấy tất cả sản phẩm nếu không có filter
-    useEffect(() => {
-        const fetchAllProducts = async () => {
-            try {
-                const data = await getListProduct();
-                setProducts(data);
-            } catch (error) {
-                handleError(error);
-            }
-        };
-        fetchAllProducts();
-    }, []);
+    const fetchAllProducts = async () => {
+        try {
+            const data = await getListProduct();
+            setProducts(data);
+        } catch (error) {
+            handleError(error);
+        }
+    };
 
-    // Gọi API lấy sản phẩm khuyến mãi khi load
+    const fetchSaleProducts = async () => {
+        try {
+            const data = await getProductSale();
+            setSaleProducts(data);
+        } catch (error) {
+            handleError(error);
+        }
+    };
+
     useEffect(() => {
-        const fetchSaleProducts = async () => {
-            try {
-                const data = await getProductSale();
-                setSaleProducts(data);
-            } catch (error) {
-                handleError(error);
-            }
-        };
-        fetchSaleProducts();
+        if (!hasFetched.current) {
+            hasFetched.current = true;
+            fetchAllProducts();
+            fetchSaleProducts();
+        }
     }, []);
 
     const fetchGetProductById = async (id: string): Promise<ProductResponse | null> => {
@@ -98,14 +96,15 @@ function useProduct() {
 
     return {
         products,
+        saleProducts,
         error,
         loading,
         fetchGetProductById,
-        setProducts,
-        saleProducts,
-        setSaleProducts,
         fetchSearchProductByName,
         fetchListFindByName,
+        setProducts,
+        setSaleProducts,
+        fetchAllProducts,
         params,
         setParams,
     };

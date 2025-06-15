@@ -17,36 +17,11 @@ interface ProductProps {
 
 const CardProduct: React.FC<ProductProps> = (props) => {
     const {fetchSaveCartItem} = useCartItem();
-    const [product, setProduct] = useState<Product>();
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState("");
-    const [notificationType, setNotificationType] = useState<"success" | "error">("success");
 
-    const showSuccessNotification = (message: string) => {
-        setNotificationMessage(message);
-        setNotificationType("success");
-        setShowNotification(true);
-
-        setTimeout(() => {
-            setShowNotification(false);
-        }, 3000);
-    };
-
-    const showErrNotification = (message: string) => {
-        setNotificationMessage(message);
-        setNotificationType("error");
-        setShowNotification(true);
-
-        setTimeout(() => {
-            setShowNotification(false);
-        }, 3000);
-    }
 
     const handleAddToCart = async () => {
         const token = localStorage.getItem('authToken');
-
         if (!token) {
-            showErrNotification("Vui lòng đăng nhập!");
             return;
         }
 
@@ -61,9 +36,7 @@ const CardProduct: React.FC<ProductProps> = (props) => {
                 productId: props.id,
                 quantity: 1,
             };
-
             await fetchSaveCartItem(cartItem);
-            showSuccessNotification("Sản phẩm đã được thêm vào giỏ hàng!");
         } catch (error) {
             console.error(error);
         }
@@ -96,12 +69,11 @@ const CardProduct: React.FC<ProductProps> = (props) => {
                         <span className="text-red-600">{formatToVND(props.price)}</span>
                     )}
 
-                    <span className="bg-red-500 p-1 rounded-md text-white text-xs">
+                    <span className="bg-red-500 p-1 rounded-md text-white text-xs  bg-red-200">
                     {(props.discount ? props.discount * 100 : 0)} %
                 </span>
                 </div>
 
-                {/* Số lượng đã bán */}
                 <div className="mt-2 text-center">
                     <div className="relative pt-1">
                         <div className="flex mb-2 items-center justify-between">

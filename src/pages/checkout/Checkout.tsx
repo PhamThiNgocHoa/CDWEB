@@ -72,8 +72,10 @@ const Checkout: React.FC = () => {
                 productId: item.product.id,
                 quantity: item.quantity
             })),
-            discountCode: discountCode || ""
+            discountCode: discountCode || "",
+            orderMethod: paymentMethod
         };
+
         try {
             const result = await fetchCreateOrderAndPayment(orderData, paymentMethod);
             console.log("Đặt hàng thành công, result:", result);

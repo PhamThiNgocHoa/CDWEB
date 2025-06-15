@@ -5,8 +5,8 @@ export enum OrderStatus {
     PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
     SHIPPING = "SHIPPING",
     DELIVERED = "DELIVERED",
-    CANCELLED = "CANCELLED"
-
+    CANCELLED = "CANCELLED",
+    RETURNED = "RETURNED"
 
 }
 
@@ -17,7 +17,8 @@ export const OrderStatusDisplayName: Record<OrderStatus, string> = {
     [OrderStatus.DELIVERED]: "Đã giao hàng",
     [OrderStatus.PAYMENT_SUCCESS]: "Đã thanh toán",
     [OrderStatus.PAYMENT_FAILED]: "Thanh toán thất bại",
-    [OrderStatus.CANCELLED]: "Đã hủy"
+    [OrderStatus.CANCELLED]: "Đã hủy",
+    [OrderStatus.RETURNED]: "Đã trả hàng"
 
 
 };

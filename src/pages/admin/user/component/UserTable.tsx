@@ -29,7 +29,7 @@ function UserTable({users, onDelete, onEdit}: Props) {
                 </tr>
                 </thead>
                 <tbody>
-                {users.map(user => (
+                {users.filter(user => user.status === "ACTIVE").map(user => (
                     <UserItem
                         key={user.id}
                         user={user}

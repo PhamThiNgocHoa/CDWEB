@@ -1,10 +1,12 @@
 import {OrderDetailRequest} from "./OrderDetailRequest";
+import {OrderMethod} from "../../enums/OrderMethod";
 
 export interface OrderRequest {
-    orderDetails: OrderDetailRequest[];
-    address: string;
-    receiver: string;
-    discountCode: string;  // không optional, không cho undefined
-    numberPhone: string;
     customerId: string;
+    address: string;
+    numberPhone: string;
+    receiver: string;
+    orderDetails: OrderDetailRequest[];
+    discountCode: string;
+    orderMethod: OrderMethod;
 }

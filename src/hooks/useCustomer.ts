@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {Customer} from "../models/Customer";
 import {authenticate, login, register} from "../server/api/authentication/auth.post";
 import {getQuantity, getUser} from "../server/api/customers/customer.get";
 import {initPasswordReset, resetPassword} from "../server/api/customers/customer.post";
@@ -9,8 +8,6 @@ import {updateCustomer} from "../server/api/customers/customer.put";
 import {IntrospectRequest} from "../models/request/IntrospectRequest";
 import {CustomerResponse} from "../models/response/CustomerResponse";
 import {useNavigate} from "react-router-dom";
-import {getCustomer, getCustomers} from "../server/api/admin/admin.get";
-import {useAuth} from "./useAuth";
 import {useToken} from "./useToken";
 
 function useCustomer() {
@@ -63,10 +60,8 @@ function useCustomer() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            if (!token) {
-                setError("Không có token đăng nhập");
-                return null;
-            }
+            if (!token || user) return;
+
             setLoading(true);
             try {
                 const userData = await getUser();
@@ -77,9 +72,10 @@ function useCustomer() {
                 setLoading(false);
             }
         };
-        fetchUser();
 
+        fetchUser();
     }, [token]);
+
 
     const fetchRegister = async (fullname: string, username: string, email: string, password: string, phone: string) => {
         setLoading(true);

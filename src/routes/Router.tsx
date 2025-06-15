@@ -22,6 +22,7 @@ import ManageCoupons from "../pages/admin/discount/ManageCoupons";
 import ManageOrders from "../pages/admin/order/ManageOrders";
 import ManageProducts from "../pages/admin/product/ManageProducts";
 import ManageUser from "../pages/admin/user/ManageUser";
+import OAuth2Redirect from "../pages/OAuth2Redirect";
 
 const Router = () => {
     return (
@@ -37,6 +38,7 @@ const Router = () => {
             <Route path="/login" element={<Login/>}/>
             <Route path="/productDetail/:id" element={<ProductDetail/>}/>
             <Route path="/cart" element={<Cart/>}/>
+            <Route path="/searchProduct" element={<SearchProduct/>}/>
             <Route path="/searchProduct/:name" element={<SearchProduct/>}/>
             <Route path="/checkout" element={<Checkout/>}/>
             <Route path="/orderHistory/:userId" element={<OrderHistory/>}/>
@@ -45,6 +47,7 @@ const Router = () => {
             <Route path="/reset-password/:username" element={<ResetPassword/>}/>
             <Route path="/account" element={<Account/>}/>
             <Route path="/payment-return" element={<PaymentReturn/>}/>
+            <Route path="/oauth2/redirect" element={<OAuth2Redirect/>}/>
 
 
             {/*    admin*/}

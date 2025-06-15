@@ -27,9 +27,12 @@ export const getAllOrders = async (): Promise<OrderResponse[]> => {
 export const getOrderByStatus = async (status: OrderStatus): Promise<OrderResponse[]> => {
     return await ApiService.get(`/api/admin/${status}`);
 }
-
-export const getOrderRevenueAtYear = async (date: string): Promise<RevenueResponse> => {
+export const getOrderRevenueAtDay = async (date: string): Promise<RevenueResponse> => {
     const response = await ApiService.get(`/api/admin/order/revenue/date/${date}`);
+    return response.data;
+}
+export const getOrderRevenueAtMonthYear = async (month: string, year: string): Promise<RevenueResponse> => {
+    const response = await ApiService.get(`/api/admin/order/revenue/${month}/${year}`);
     return response.data;
 }
 export const getAllDiscounts = async (): Promise<Discount[]> => {
