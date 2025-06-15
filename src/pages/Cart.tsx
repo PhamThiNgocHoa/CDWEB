@@ -4,20 +4,18 @@ import Footer from "../components/Footer";
 import formatToVND from "../hooks/formatToVND";
 import CartItem from "../components/CartItem";
 import useCart from "../hooks/useCart";
-import {getCurrentUserId} from "../utils/authUtils";
 import useCartItem from "../hooks/useCartItem";
 import {CartItemRequest} from "../models/request/CartItemRequest";
 import {Link, useNavigate} from "react-router-dom";
 import Notification from "../components/Notification";
 import {CartItemResponse} from "../models/response/CartItemResponse";
+import useCustomer from "../hooks/useCustomer";
 
 const Cart = () => {
-
-    const tokenData = getCurrentUserId();
-    const customerId = tokenData || undefined;
-    const {fetchCart} = useCart(customerId);
+    const {user} = useCustomer();
+    const {fetchCart} = useCart(user?.id);
     const navigator = useNavigate();
-    const {cartData, loading, error} = useCart(customerId);
+    const {cartData, loading, error} = useCart(user?.id);
 
     const [cartItems, setCartItems] = useState<CartItemResponse[]>([]);
     const {fetchDeleteCartItem, fetchUpdateQuantityCartItem} = useCartItem();
@@ -94,15 +92,16 @@ const Cart = () => {
         );
     }
 
-    if (error) {
+    if (user?.role === "ADMIN") {
         return (
             <>
                 <Header/>
-                <div className="p-6 text-center text-red-600">Lỗi: {error}</div>
+                <div className="p-6 text-center">Bạn không có giỏ hàng</div>
                 <Footer/>
             </>
         );
     }
+
 
     return (
         <>

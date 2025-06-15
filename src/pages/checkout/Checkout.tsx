@@ -54,7 +54,7 @@ const Checkout: React.FC = () => {
     const [finalTotalAmoun, setFinalTotalAmoun] = useState<number>();
 
     const totalAmount = cartData?.cartItems?.reduce(
-        (total, item) => total + item.product.price * item.quantity,
+        (total, item) => total + (item.product.price *(1-Number(item.product.discount)/100)) * item.quantity,
         0
     ) || 0;
 

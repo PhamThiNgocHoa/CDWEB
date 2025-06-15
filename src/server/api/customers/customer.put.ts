@@ -8,7 +8,7 @@ export const updateCustomer = async (customerId: string | undefined, customer: {
     email: string;
     username: string
 }): Promise<void> => {
-    const response = await ApiService.put(`/api/customer/${customerId}`, customer);
+    const response = await ApiService.patch(`/api/customer/${customerId}`, customer);
     return response.message;
 
 };
