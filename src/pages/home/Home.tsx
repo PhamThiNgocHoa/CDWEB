@@ -13,7 +13,8 @@ import ListCategory from "../../components/ListCategory";
 import {Product} from "../../models/Product";
 import useProduct from "../../hooks/useProduct";
 import {ProductResponse} from "../../models/response/ProductResponse";
-import useCustomer from "../../hooks/useCustomer"; // Import component Error popup
+import useCustomer from "../../hooks/useCustomer";
+import ProductDetailView from "../ProductDetailView"; // Import component Error popup
 
 const mainImages = [
     '../image/TrangUuDaiT525_840x320.webp',
@@ -41,8 +42,6 @@ const navItems = [
 
 const Home = () => {
     const navigate = useNavigate();
-    const {categories, setCategories} = useCategory();
-
     const handleProductClick = (id: string) => {
         navigate(`/productDetail/${id}`);
     };
@@ -52,10 +51,10 @@ const Home = () => {
         setSaleProducts
     } = useProduct();
 
-    const [showAllProducts, setShowAllProducts] = useState(false);  // state mới để kiểm soát số lượng sản phẩm hiển thị
+    const [showAllProducts, setShowAllProducts] = useState(false);
 
     const toggleShowAllProducts = () => {
-        setShowAllProducts(!showAllProducts);  // Thay đổi trạng thái khi nhấn nút "Xem thêm"
+        setShowAllProducts(!showAllProducts);
     };
     const {user} = useCustomer();
 
@@ -90,8 +89,8 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="cursor-pointer">
-                    <ListCategory items={categories}/>
+                <div className="cursor-pointer sm:px-10 md:px-10 lg:px-22 xl:px-36">
+                    <ProductDetailView/>
                 </div>
 
                 <div className="mt-8 sm:px-10 md:px-10 lg:px-22 xl:px-36 pb-6">
