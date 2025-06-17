@@ -6,6 +6,7 @@ export interface Customer {
     username: string;
     password: string;
     role?: string;
+    status?: string;
     resetCode?: string;
 
 }

@@ -13,7 +13,7 @@ const UpdateAccountPopup = ({onClose}: { onClose: () => void }) => {
         email: "",
         phone: "",
         username: "",
-        password: "",
+        // password: "",
     });
 
     useEffect(() => {
@@ -23,7 +23,7 @@ const UpdateAccountPopup = ({onClose}: { onClose: () => void }) => {
                 email: user.email || "",
                 phone: user.phone || "",
                 username: user.username || "",
-                password: user.password || "",
+                // password: user.password || "",
             });
         }
     }, [user]);
@@ -98,19 +98,6 @@ const UpdateAccountPopup = ({onClose}: { onClose: () => void }) => {
                             value={formData.username}
                             onChange={handleChange}
                             className="mb-3 w-full border px-4 py-2 rounded"
-                        />
-                    </div>
-
-                    <div className="flex">
-                        <label className="w-32">Mật khẩu</label>
-
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Mật khẩu"
-                            value={formData.password}
-                            readOnly
-                            className="mb-3 w-full border px-4 py-2 rounded bg-gray-100 cursor-not-allowed"
                         />
                     </div>
                     <div className="flex">

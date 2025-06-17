@@ -1,95 +1,40 @@
-import { RatingRequest, RatingResponse } from './../server/api/rating/rating';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  createRating,
-  updateRating,
-  getRatingsByProduct,
-  getAvgRating,
+    createRating,
+    getAvgRating,
+    getRatingsByProduct,
+    RatingRequest,
+    RatingResponse
 } from "../server/api/rating/rating";
 
-function useRating(productId?: string) {
-  const [ratings, setRatings] = useState<RatingResponse[]>([]);
-  const [average, setAverage] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const hasFetched = useRef<boolean>(false);
+export const useRating = (productId: string) => {
+    const [ratings, setRatings] = useState<RatingResponse[]>([]);
+    const [average, setAverage] = useState<number>(0);
 
-  const handleError = (error: unknown) => {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    setError(message);
-    console.error("useRating error:", message);
-  };
+    const fetchRatings = async () => {
+        const data = await getRatingsByProduct(productId);
+        console.log("Ratings fetch được:", data);
+        setRatings(data);
+    };
 
-  const fetchRatings = async () => {
-    if (!productId) return;
-    setLoading(true);
-    try {
-      const data = await getRatingsByProduct(productId);
-      setRatings(data);
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchAverage = async () => {
+        const avg = await getAvgRating(productId);
+        setAverage(avg);
+    };
 
-  const fetchAverageRating = async () => {
-    if (!productId) return;
-    try {
-      const avg = await getAvgRating(productId);
-      setAverage(avg);
-    } catch (err) {
-      handleError(err);
-    }
-  };
+    const submitRating = async (rating: RatingRequest) => {
+        const res = await createRating(rating);
+        await fetchRatings();
+        await fetchAverage();
+        return res;
+    };
 
-  useEffect(() => {
-    if (!hasFetched.current && productId) {
-      hasFetched.current = true;
-      fetchRatings();
-      fetchAverageRating();
-    }
-  }, [productId]);
+    useEffect(() => {
+        if (productId) {
+            fetchRatings();
+            fetchAverage();
+        }
+    }, [productId]);
 
-  const handleCreateRating = async (payload: RatingRequest): Promise<void> => {
-    setLoading(true);
-    try {
-      await createRating(payload);
-      await fetchRatings();
-      await fetchAverageRating();
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdateRating = async (
-    ratingId: string,
-    payload: Pick<RatingRequest, "comment" | "score">
-  ): Promise<void> => {
-    setLoading(true);
-    try {
-      await updateRating(ratingId, payload);
-      await fetchRatings();
-      await fetchAverageRating();
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return {
-    ratings,
-    average,
-    loading,
-    error,
-    fetchRatings,
-    fetchAverageRating,
-    handleCreateRating,
-    handleUpdateRating,
-  };
-}
-
-export default useRating;
+    return { ratings, average, submitRating, fetchRatings };
+};

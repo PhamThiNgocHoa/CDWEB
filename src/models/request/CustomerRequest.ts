@@ -3,7 +3,8 @@ export interface CustomerRequest {
     email: string;
     phone: string;
     username: string;
-    password: string;
+    status?: string;
+    role?: string;
 
 }
 

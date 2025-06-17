@@ -16,6 +16,7 @@ import {OrderDetailRequest} from "../../models/request/OrderDetailRequest";
 import {checkDiscount} from "../../server/api/order/order.post";
 import {useNavigate} from "react-router-dom";
 import Notification from "../../components/Notification";
+import {useDiscount} from "../../hooks/useDiscount";
 
 const Checkout: React.FC = () => {
     const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
@@ -51,6 +52,7 @@ const Checkout: React.FC = () => {
     const [selectedAddress, setSelectedAddress] = useState<any>(null);
     const [showAllAddresses, setShowAllAddresses] = useState(false);
     const {fetchCreateOrderAndPayment} = useOrder();
+    const {coupons} = useDiscount();
     const [finalTotalAmoun, setFinalTotalAmoun] = useState<number>();
 
     const totalAmount = cartData?.cartItems?.reduce(
@@ -84,7 +86,6 @@ const Checkout: React.FC = () => {
         }
     };
 
-    // Tạo địa chỉ mới
     const handleCreateAddress = async () => {
         const fullAddress = `${houseNumber ? houseNumber + ', ' : ''}${districts.find(d => d.code === Number(selectedDistrict))?.name || ''}, ${provinces.find(p => p.code === Number(selectedProvince))?.name || ''}`;
         const request = {
@@ -102,7 +103,6 @@ const Checkout: React.FC = () => {
         }
     };
 
-    // Load địa chỉ của khách hàng khi user thay đổi
     useEffect(() => {
         const loadAddresses = async () => {
             if (!user) return;
@@ -117,12 +117,10 @@ const Checkout: React.FC = () => {
         loadAddresses();
     }, [user]);
 
-    // Xử lý chọn địa chỉ giao hàng đã lưu
     const handleAddressSelect = (address: any) => {
         setSelectedAddress(address);
     };
 
-    // Xóa địa chỉ giao hàng đã lưu
     const handleDeleteAddress = async (id: string) => {
         try {
             await fetchDeleteAddress(id);
@@ -176,7 +174,6 @@ const Checkout: React.FC = () => {
         fetchProvinces();
     }, []);
 
-    // Lấy danh sách quận/huyện khi chọn tỉnh/thành
     useEffect(() => {
         if (selectedProvince) {
             const fetchDistricts = async () => {
@@ -410,47 +407,74 @@ const Checkout: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-row">
-                        <div className="py-6 bg-white mr-5 px-6 rounded-md">
-                            <input
-                                type="text"
-                                name="discountCode"
-                                placeholder="Mã giảm giá"
-                                value={discountCode}
-                                onChange={(e) => setDiscountCode(e.target.value)}
-                                className="p-2 border border-gray-300 rounded-l-md"
-                            />
-                            <button
-                                type="button"
-                                onClick={handleApplyDiscount}
-                                className="p-2 bg-red-600 text-white rounded-r-md  hover:bg-red-700"
-                            >
-                                Áp dụng
-                            </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="bg-white grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
+                            <div className=" mr-5 px-6 rounded-md">
+                                <input
+                                    type="text"
+                                    name="discountCode"
+                                    placeholder="Mã giảm giá"
+                                    value={discountCode}
+                                    onChange={(e) => setDiscountCode(e.target.value)}
+                                    className="p-2 border border-gray-300 rounded-l-md"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleApplyDiscount}
+                                    className="p-2 bg-red-600 text-white rounded-r-md  hover:bg-red-700"
+                                >
+                                    Áp dụng
+                                </button>
+                            </div>
+                            <div>
+                                {coupons?.length > 0 && (
+                                    <div className="mr-5 border border-gray-200 rounded-md p-3 bg-gray-50">
+                                        <p className="text-sm font-medium mb-2 text-gray-700">Mã giảm giá hiện có:</p>
+                                        <ul className="space-y-1 text-sm">
+                                            {coupons.map((coupon) => (
+                                                <li key={coupon.id}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setDiscountCode(coupon.code)}
+                                                        className="text-red-600 hover:underline"
+                                                    >
+                                                        {coupon.code} - Giảm {coupon.percent}%
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="bg-white p-6 rounded-md">
                             <h3 className="font-medium text-lg mb-4">Phương thức thanh toán</h3>
-                            <div className="flex space-x-6">
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {Object.values(OrderMethod).map((method) => (
-                                    <div key={method} className="flex items-center">
+                                    <label
+                                        key={method}
+                                        htmlFor={`payment-${method}`}
+                                        className={`flex items-center border rounded px-4 py-3 cursor-pointer transition duration-200 shadow-sm hover:shadow-md ${
+                                            paymentMethod === method ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'
+                                        }`}
+                                    >
                                         <input
                                             id={`payment-${method}`}
-                                            type="checkbox"
+                                            type="radio"
+                                            name="payment"
                                             value={method}
                                             checked={paymentMethod === method}
                                             onChange={() => setPaymentMethod(method)}
-                                            className="mr-2 w-3 h-3 "
-                                            style={{accentColor: 'red'}}
+                                            className="mr-3 accent-red-500 w-4 h-4"
                                         />
-
-                                        <label htmlFor={`payment-${method}`}>
-                                            {OrderMethodDisplayName[method]}
-                                        </label>
-                                    </div>
+                                        <span className="text-sm font-medium">{OrderMethodDisplayName[method]}</span>
+                                    </label>
                                 ))}
                             </div>
                         </div>
+
                     </div>
 
                     <div className="bg-white p-6 rounded-md mt-6">

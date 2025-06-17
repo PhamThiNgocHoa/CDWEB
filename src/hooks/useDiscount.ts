@@ -20,11 +20,6 @@ export const useDiscount = () => {
             setError("Không có token đăng nhập");
             return;
         }
-        if (user?.role !== "ADMIN") {
-            setError("Bạn không có quyền thực hiện thao tác này");
-            return;
-        }
-
         setLoading(true);
         setError(null);
         const fetchData = async () => {

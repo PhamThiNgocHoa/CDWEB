@@ -11,18 +11,20 @@ interface Props {
 function UserForm({ user, onSubmit, onCancel }: Props) {
     const [form, setForm] = useState<CustomerRequest>({
         fullname: "",
-        password: "",
         phone: "",
         username: "",
         email: "",
+        status: "ACTIVE",
+        role: "USER",
     });
 
     const [initialForm, setInitialForm] = useState<CustomerRequest>({
         fullname: "",
-        password: "",
         phone: "",
         username: "",
         email: "",
+        status: "ACTIVE",
+        role: "USER",
     });
 
     useEffect(() => {
@@ -32,36 +34,31 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
                 email: user.email,
                 phone: user.phone,
                 username: user.username,
-                password: user.password,
+                status: user.status,
+                role: user.role,
             };
             setForm(initial);
-            setInitialForm(initial); // lưu bản gốc để so sánh khi submit
+            setInitialForm(initial);
         } else {
             const emptyForm = {
                 fullname: "",
-                password: "",
                 phone: "",
                 username: "",
                 email: "",
+                status: "ACTIVE",
+                role: "USER",
             };
             setForm(emptyForm);
             setInitialForm(emptyForm);
         }
     }, [user]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!user) {
-            // Thêm mới → gửi toàn bộ form
             onSubmit(form);
         } else {
-            // Chỉ gửi các trường thay đổi
             const changedFields: Partial<CustomerRequest> = {};
 
             for (const key in form) {
@@ -79,13 +76,21 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
         }
     };
 
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
     const handleCancel = () => {
         setForm({
             fullname: "",
-            password: "",
             phone: "",
             username: "",
             email: "",
+            status: "ACTIVE",
+            role: "USER",
         });
         if (onCancel) onCancel();
     };
@@ -127,16 +132,26 @@ function UserForm({ user, onSubmit, onCancel }: Props) {
                     className="border p-2 rounded"
                     required
                 />
-                <input
-                    type="password"
-                    name="password"
-                    value={form.password}
+                <select
+                    name="status"
+                    value={form.status}
                     onChange={handleChange}
-                    placeholder="Mật khẩu"
                     className="border p-2 rounded"
-                    required={!isEditing}
-                    readOnly={isEditing}
-                />
+                    required
+                >
+                    <option value="ACTIVE">Hoạt động</option>
+                    <option value="DELETED">Khóa</option>
+                </select>
+                <select
+                    name="role"
+                    value={form.role}
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                    required
+                >
+                    <option value="USER">Người dùng</option>
+                    <option value="ADMIN">Quản trị viên</option>
+                </select>
             </div>
             <div className="space-x-3">
                 <button

@@ -12,7 +12,7 @@ export interface RatingResponse {
   customerName: string;
   comment: string;
   score: number;
-  createdAt: string;
+  createdAt?: string;
 }
 
 
@@ -45,7 +45,7 @@ export const getRatingsByProduct = async (
   const res = await ApiService.get(
     `/api/rating/product/${productId}`
   );
-  return res.data.data;
+  return res.data;
 };
 
 
@@ -53,5 +53,5 @@ export const getAvgRating = async (productId: string): Promise<number> => {
   const res = await ApiService.get(
     `/api/rating/avg/${productId}`
   );
-  return res.data.data;
+  return res.data;
 };
