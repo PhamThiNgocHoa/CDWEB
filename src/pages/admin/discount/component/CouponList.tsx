@@ -43,7 +43,6 @@ function CouponList({coupons, onDelete, onUpdate}: Props) {
             <table className="min-w-full table-auto border-collapse border border-gray-300">
                 <thead>
                 <tr className="bg-gray-200">
-                    <th className="border border-gray-300 p-2">ID</th>
                     <th className="border border-gray-300 p-2">Mã</th>
                     <th className="border border-gray-300 p-2">Giảm (%)</th>
                     <th className="border border-gray-300 p-2">Ngày bắt đầu</th>
@@ -61,7 +60,6 @@ function CouponList({coupons, onDelete, onUpdate}: Props) {
                 )}
                 {coupons.map((coupon) => (
                     <tr key={coupon.id} className="border-t border-gray-300">
-                        <td className="border border-gray-300 p-2 text-center">{coupon.id}</td>
                         <td className="border border-gray-300 p-2 text-center">
                             {editId === coupon.id ? (
                                 <input

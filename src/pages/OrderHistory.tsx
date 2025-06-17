@@ -42,7 +42,7 @@ function OrderHistory() {
                 const otherCount = row.orderDetails.length - 1;
                 return (
                     <div>
-                        <div className="text-sm">{product.name}</div>
+                        <div className="text-sm">{product?.name}</div>
                         {otherCount > 0 && (
                             <div className="text-gray-500 text-md">và {otherCount} sản phẩm khác</div>
                         )}

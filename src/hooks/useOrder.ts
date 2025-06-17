@@ -47,7 +47,7 @@ const useOrder = () => {
                 setOrderId(orderResponse);
 
                 if (method === OrderMethod.VN_PAY) {
-                    const returnUrl = "https://fahabook-be-production.up.railway.app/api/payments/vnpay-return"; // ✅ Không dùng localhost
+                    const returnUrl = "http://localhost:3000/payment-return";
                     const paymentUrl = await createPayment(orderResponse ?? "", returnUrl);
 
                     if (paymentUrl) {

@@ -76,11 +76,11 @@ export const useOrderManagement = (token: string | null, role: string | undefine
         }
     };
     const validTransitions: Record<OrderStatus, OrderStatus[]> = {
-        [OrderStatus.PENDING_PAYMENT]: [OrderStatus.PENDING, OrderStatus.CANCELLED, OrderStatus.PAYMENT_SUCCESS],
+        [OrderStatus.PENDING_PAYMENT]: [OrderStatus.CANCELLED, OrderStatus.PAYMENT_SUCCESS],
         [OrderStatus.PENDING]: [OrderStatus.SHIPPING, OrderStatus.CANCELLED],
         [OrderStatus.SHIPPING]: [OrderStatus.DELIVERED, OrderStatus.RETURNED],
         [OrderStatus.DELIVERED]: [OrderStatus.RETURNED],
-        [OrderStatus.PAYMENT_SUCCESS]: [],
+        [OrderStatus.PAYMENT_SUCCESS]: [OrderStatus.SHIPPING, OrderStatus.DELIVERED],
         [OrderStatus.PAYMENT_FAILED]: [],
         [OrderStatus.CANCELLED]: [],
         [OrderStatus.RETURNED]: [],
