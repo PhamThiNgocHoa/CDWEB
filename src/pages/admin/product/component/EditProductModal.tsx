@@ -3,6 +3,7 @@ import { BookForm } from "../../../../enums/BookForm";
 import { ProductResponse } from "../../../../models/response/ProductResponse";
 import useCategory from "../../../../hooks/useCategory";
 import {Product} from "../../../../models/Product";
+import {uploadImage} from "../../../../server/api/imageUpload/image.post";
 
 interface EditProductModalProps {
     product: ProductResponse;
@@ -45,14 +46,20 @@ function EditProductModal({ product, onClose, onSave }: EditProductModalProps) {
         }
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const imageLink = URL.createObjectURL(file);
+        if (!file) return;
+
+        try {
+            const imageUrl = await uploadImage(file);
+
             setEditForm((prev) => ({
                 ...prev,
-                img: imageLink,
+                img: imageUrl,
             }));
+        } catch (error) {
+            console.error("Lỗi upload ảnh:", error);
+            alert("Tải ảnh lên thất bại. Vui lòng thử lại.");
         }
     };
 
@@ -81,7 +88,7 @@ function EditProductModal({ product, onClose, onSave }: EditProductModalProps) {
             type: "select",
             options: categories.map((cat) => ({ key: cat.name, val: cat.name })),
         },
-        { name: "discount", label: "Giảm giá (%)", type: "number", min: 0, max: 100 },
+        { name: "discount", label: "Giảm giá (%)", type: "number", min: 0, max: 1, step: 0.01 },
         { name: "stock", label: "Tồn kho", type: "number" },
     ];
 
@@ -90,7 +97,7 @@ function EditProductModal({ product, onClose, onSave }: EditProductModalProps) {
             <div className="bg-white p-6 rounded shadow w-[720px] max-h-[90vh] overflow-auto">
                 <h2 className="text-xl font-semibold mb-6 text-center">Sửa sản phẩm</h2>
                 <div className="flex justify-center mb-4">
-                    {/* Hình ảnh và upload */}
+
                     <div className="flex flex-col items-center justify-start mr-4">
                         <img
                             src={editForm.img}
@@ -105,7 +112,7 @@ function EditProductModal({ product, onClose, onSave }: EditProductModalProps) {
                                 className="block w-full text-sm text-gray-500"
                             />
                             <input
-                                type="text"
+                                type="hidden"
                                 value={editForm.img}
                                 readOnly
                                 className="mt-2 w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-600"
@@ -115,7 +122,7 @@ function EditProductModal({ product, onClose, onSave }: EditProductModalProps) {
 
                     {/* Các trường dữ liệu */}
                     <div className="grid grid-cols-4 gap-x-6 gap-y-4">
-                        {fields.map(({ name, label, type, colSpan, options, min, max }) => (
+                        {fields.map(({ name, label, type, colSpan, options, min, max, step }) => (
                             <div key={name} className={colSpan === 3 ? "col-span-3" : ""}>
                                 <label className="block mb-1 font-medium">{label}:</label>
                                 {type === "textarea" ? (
@@ -148,6 +155,7 @@ function EditProductModal({ product, onClose, onSave }: EditProductModalProps) {
                                         className="w-full border border-gray-300 rounded px-3 py-2"
                                         min={min}
                                         max={max}
+                                        step={step}
                                     />
                                 )}
                             </div>

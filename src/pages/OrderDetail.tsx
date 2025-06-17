@@ -61,11 +61,11 @@ function OrderDetail() {
                             </h2>
                             <ul className="space-y-1 pl-10 text-gray-700">
                                 <li>
-                                    <strong>Họ tên:</strong> {orders?.[0]?.customerDTO?.fullname ?? ""}
+                                    <strong>Họ tên:</strong> {orders?.[0]?.receiver?? ""}
 
                                 </li>
                                 <li>
-                                    <strong>Số điện thoại:</strong> {orders?.[0]?.customerDTO?.phone}
+                                    <strong>Số điện thoại:</strong> {orders?.[0]?.numberPhone}
                                 </li>
                             </ul>
                         </section>

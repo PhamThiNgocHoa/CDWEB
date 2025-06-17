@@ -45,14 +45,11 @@ const CategoryRow: React.FC<CategoryRowProps> = ({category, onDelete, onSaveEdit
     return (
         <>
             <tr className="border-t">
-                <td className="p-3">{category.id}</td>
+                <td className="p-3">{category.code}</td>
                 <td className="p-3">{category.name}</td>
                 <td className="p-3">
                     {category.description
-                        ? category.description.length > 20
-                            ? category.description.substring(0, 20) + "..."
-                            : category.description
-                        : ""}
+                    }
                 </td>
                 <td className="p-3 space-x-2">
                     <button

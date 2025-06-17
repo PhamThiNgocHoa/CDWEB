@@ -17,7 +17,7 @@ const CategoryList: React.FC<CategoryListProps> = ({
 
     const filteredCategories = categories.filter((cat) => {
         const term = searchTerm.toLowerCase();
-        const idStr = String(cat.id).toLowerCase();
+        const idStr = String(cat.code).toLowerCase();
         return (
             idStr.includes(term) || cat.name.toLowerCase().includes(term)
         );

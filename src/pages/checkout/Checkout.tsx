@@ -54,7 +54,7 @@ const Checkout: React.FC = () => {
     const [finalTotalAmoun, setFinalTotalAmoun] = useState<number>();
 
     const totalAmount = cartData?.cartItems?.reduce(
-        (total, item) => total + (item.product.price *(1-Number(item.product.discount)/100)) * item.quantity,
+        (total, item) => total + (item.product.price * (1 - Number(item.product.discount))) * item.quantity,
         0
     ) || 0;
 
@@ -469,8 +469,12 @@ const Checkout: React.FC = () => {
                                 <tr key={item.product.id}>
                                     <td className="py-2 px-4 border-b border-gray-300">{item.product.name}</td>
                                     <td className="py-2 px-4 border-b border-gray-300">{item.quantity}</td>
-                                    <td className="py-2 px-4 border-b border-gray-300">{formatToVND(item.product.price)}</td>
-                                    <td className="py-2 px-4 border-b border-gray-300">{formatToVND(item.product.price * item.quantity)}</td>
+                                    <td className="py-2 px-4 border-b border-gray-300">{formatToVND(item.product.price * (1 - Number(item.product.discount)))}</td>
+                                    <td className="py-2 px-4 border-b border-gray-300">
+                                        {formatToVND(
+                                            item.product.price * (1 - (Number(item.product.discount || 0))) * item.quantity
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>
@@ -480,7 +484,8 @@ const Checkout: React.FC = () => {
                                 <td className="font-semibold py-2 px-4">{formatToVND(totalAmount)}</td>
                             </tr>
                             <tr>
-                                <td colSpan={3} className="text-right font-semibold py-2 px-4">Tiền sau khi giảm giá:</td>
+                                <td colSpan={3} className="text-right font-semibold py-2 px-4">Tiền sau khi giảm giá:
+                                </td>
                                 <td className="font-semibold py-2 px-4">{formatToVND(finalTotalAmoun ?? totalAmount)}</td>
                             </tr>
                             </tfoot>
