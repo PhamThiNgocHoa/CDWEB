@@ -28,7 +28,7 @@ const ProductDetailView: React.FC = () => {
         if (!selectedCategoryId) return;
 
         const filtered = products.filter((p) => p.categoryId === selectedCategoryId);
-        setFilteredProducts(filtered.slice(0, 10)); // ✅ Chỉ lấy 10 sản phẩm đầu
+        setFilteredProducts(filtered.slice(0, 10)); 
         setSelectedProduct(filtered[0] || null);
     }, [selectedCategoryId, products]);
 

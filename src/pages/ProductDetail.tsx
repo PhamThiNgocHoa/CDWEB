@@ -1,45 +1,40 @@
 // ProductDetail.tsx
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import formatToVND from "../hooks/formatToVND";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {getProductById} from "../server/api/product/product.get";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { getProductById } from "../server/api/product/product.get";
 import useCartItem from "../hooks/useCartItem";
-import {CartItemRequest} from "../models/request/CartItemRequest";
-import {getUser} from "../server/api/customers/customer.get";
+import { CartItemRequest } from "../models/request/CartItemRequest";
+import { getUser } from "../server/api/customers/customer.get";
 import Notification from "../components/Notification";
-import {ProductResponse} from "../models/response/ProductResponse";
+import { ProductResponse } from "../models/response/ProductResponse";
+import useRating from "../hooks/useRating";
 
 const ProductDetail = () => {
     type Ratings = {
         [key: number]: number;
     };
 
-    const [ratings, setRatings] = useState<Ratings>({
-        5: 0,
-        4: 0,
-        3: 0,
-        2: 0,
-        1: 0,
-    });
 
     const [reviews, setReviews] = useState([
-        {stars: 5, content: "Sản phẩm tuyệt vời, rất đáng mua!"},
-        {stars: 4, content: "Chất lượng tốt nhưng có thể cải thiện."},
-        {stars: 3, content: "Sản phẩm trung bình, không như mong đợi."},
-        {stars: 3, content: "Sản phẩm trung bình, không như mong đợi."},
+        { stars: 5, content: "Sản phẩm tuyệt vời, rất đáng mua!" },
+        { stars: 4, content: "Chất lượng tốt nhưng có thể cải thiện." },
+        { stars: 3, content: "Sản phẩm trung bình, không như mong đợi." },
+        { stars: 3, content: "Sản phẩm trung bình, không như mong đợi." },
     ]);
 
     const [reviewText, setReviewText] = useState("");
-    const {id} = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>();
     const [product, setProduct] = useState<ProductResponse>();
     const [loading, setLoading] = useState(true);
-    const {fetchSaveCartItem} = useCartItem();
+    const { fetchSaveCartItem } = useCartItem();
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState("");
     const [notificationType, setNotificationType] = useState<"success" | "error">("success");
     const navigate = useNavigate()
+    const { ratings, average, handleCreateRating } = useRating(id);
 
 
     const showSuccessNotification = (message: string) => {
@@ -62,15 +57,30 @@ const ProductDetail = () => {
         }, 3000);
     }
 
-    const handleReviewSubmit = () => {
-        if (reviewText.trim() === "") {
+    const handleReviewSubmit = async () => {
+        if (reviewText.trim() === "" || !id) {
             alert("Vui lòng viết đánh giá");
             return;
         }
-        setReviews([...reviews, {stars: 5, content: reviewText}]);
+
+        const customerId = localStorage.getItem("customerId"); // hoặc lấy từ context
+        if (!customerId) {
+            showErrNotification("Bạn cần đăng nhập để đánh giá.");
+            return;
+        }
+
+        const payload = {
+            productId: id,
+            customerId,
+            comment: reviewText,
+            score: 5, // có thể cho người dùng chọn số sao
+        };
+
+        await handleCreateRating(payload);
         setReviewText("");
-        alert("Đánh giá của bạn đã được gửi!");
+        showSuccessNotification("Đánh giá của bạn đã được gửi!");
     };
+
 
     useEffect(() => {
         if (id) {
@@ -121,7 +131,7 @@ const ProductDetail = () => {
 
     return (
         <>
-            <Header/>
+            <Header />
             <div className="bg-gray-100">
                 <div className="sm:px-10 md:px-20 lg:px-28">
                     {showNotification && (
@@ -153,24 +163,24 @@ const ProductDetail = () => {
                                 <h2 className="text-2xl font-bold mb-4">{product?.name}</h2>
                                 {Number(product?.discount) > 0 ? (
                                     <div className="flex">
-                                    <span className="text-xl text-red-500 mb-4 font-bold">
-                                    {formatToVND((Number(product?.price) * (1 - Number(product?.discount))))}
-                                  </span>
+                                        <span className="text-xl text-red-500 mb-4 font-bold">
+                                            {formatToVND((Number(product?.price) * (1 - Number(product?.discount))))}
+                                        </span>
 
                                         <span
                                             className="bg-red-500 rounded-md h-4 px-2 py-1 text-white text-xs pb-6 ml-10">
-                                              {product?.discount ? `${(Number(product.discount) * 100).toFixed(0)} %` : "0 %"}
-                                            </span>
+                                            {product?.discount ? `${(Number(product.discount) * 100).toFixed(0)} %` : "0 %"}
+                                        </span>
 
                                         <span className="text-md line-through text-gray-500 mb-4 font-bold ml-10">
-                                    {formatToVND((product?.price ?? 0))}
-                                  </span>
+                                            {formatToVND((product?.price ?? 0))}
+                                        </span>
                                     </div>
                                 ) : (
                                     <div className="mb-4">
                                         <span className="text-xl text-red-500 font-bold ml-2">
-                                        {formatToVND((product?.price ?? 0))}
-                                    </span>
+                                            {formatToVND((product?.price ?? 0))}
+                                        </span>
                                     </div>
                                 )}
 
@@ -273,7 +283,7 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </>
     )
         ;
